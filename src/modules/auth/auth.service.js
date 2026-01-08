@@ -46,8 +46,7 @@ export const loginUser = async ({ email, password }) => {
   }
 
   return jwt.sign(
-    // { sub: user.id, email: user.email, role_id: user.role_id },
-    { sub: user.id },
+    { sub: user.id, role_id: user.role_id },
     config.security.jwtSecret,
     { expiresIn: config.security.jwtExpiration }
   );

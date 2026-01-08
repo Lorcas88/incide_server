@@ -1,25 +1,27 @@
 export const errorHandler = (err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || "error";
-
   if (process.env.NODE_ENV === "development") {
-    res.status(err.statusCode).json({
-      error: err,
-      message: err.message,
-      stack: err.stack,
-    });
+    console.error(err);
+  }
+
+  const status = err.status || 500;
+  const code = err.code || "INTERNAL_SERVER_ERROR";
+  const message = err.message || "Ha ocurrido un error";
+
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "test"
+  ) {
+    res.status(status).json({ error: { code, message } });
   } else {
     // Production
     if (err.isOperational) {
-      res.status(err.statusCode).json({
-        message: err.message,
-      });
+      res.status(status).json({ error: { message } });
     } else {
       // Programming or other unknown error: don't leak details
       console.error("ERROR 💥", err);
       res.status(500).json({
-        status: "error",
-        message: "Algo salió mal",
+        code,
+        message: "Ha ocurrido un error",
       });
     }
   }

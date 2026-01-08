@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
 import User from "./user.model.js";
+import Role from "../roles/role.model.js";
 import AppError from "../../utils/AppError.js";
 
 const userModel = new User();
+const roleModel = new Role();
 
 export const getAllUsers = async () => {
   return userModel.all();

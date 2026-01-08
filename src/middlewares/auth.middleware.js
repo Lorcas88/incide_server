@@ -1,30 +1,25 @@
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
+import AppError from "../utils/AppError.js";
 
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader)
-    return res.status(401).json({
-      error: {
-        code: "TOKEN_REQUIRED",
-        message: "Token requerido",
-      },
-    });
+  if (!authHeader) throw new AppError("Token requerido", "TOKEN_REQUIRED", 401);
 
   // To obtain only the token and not the Bearer word included on the request
   const token = authHeader.split(" ")[1];
 
   try {
     const payload = jwt.verify(token, config.security.jwtSecret);
-    req.user = { id: payload.sub };
+    // const user = await userService.getById(payload.sub);
+    // if (!user) {
+    //   throw new AppError("Unauthorized", 401);
+    // }
+
+    req.user = { id: payload.sub, role_id: payload.role_id };
     next();
   } catch {
-    return res.status(401).json({
-      error: {
-        code: "TOKEN_INVALID",
-        message: "Token inválido o expirado",
-      },
-    });
+    throw new AppError("Token inválido o expirado", "TOKEN_INVALID", 401);
   }
 };

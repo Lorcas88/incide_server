@@ -1,5 +1,4 @@
 export const config = {
-  // Database
   db: {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -12,8 +11,6 @@ export const config = {
     // enableKeepAlive: true,
     // keepAliveInitialDelay: 0,
   },
-
-  // Server
   server: {
     port: process.env.PORT || 3000,
     // environment: process.env.NODE_ENV || "development",
@@ -21,8 +18,6 @@ export const config = {
     // frontendPort: process.env.FRONTEND_PORT,
     // host: process.env.HOST || "127.0.0.1",
   },
-
-  // Security
   security: {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiration: process.env.JWT_EXPIRES_IN || "1h",
@@ -34,5 +29,14 @@ export const config = {
     //   authMaxAttempts: 5,
     // },
     // bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS),
+  },
+  cors: {
+    origin: "http://localhost:5173", // tu frontend
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+  rateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100,
   },
 };
