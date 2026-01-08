@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { destroy, index, show, store, update } from "./user.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
-import { userValidation, validateResult } from "./user.validator.js";
+import {
+  idValidation,
+  storeValidation,
+  updateValidation,
+} from "./user.validator.js";
 
 const router = Router();
 
@@ -9,15 +13,15 @@ const router = Router();
 router.get("/", authMiddleware, index);
 
 // Get a user by id
-router.get("/:id", authMiddleware, show);
+router.get("/:id", idValidation, authMiddleware, show);
 
 // Create a new user
-router.post("/", userValidation, validateResult, authMiddleware, store);
+router.post("/", storeValidation, authMiddleware, store);
 
 // Update a user
-router.put("/:id", authMiddleware, update);
+router.put("/:id", updateValidation, authMiddleware, update);
 
 // Delete a user
-router.delete("/:id", authMiddleware, destroy);
+router.delete("/:id", idValidation, authMiddleware, destroy);
 
 export default router;

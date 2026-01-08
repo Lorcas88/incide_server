@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { destroy, index, show, store, update } from "./ticket.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
-import { ticketValidation, validateResult } from "./ticket.validator.js";
+import {
+  idValidation,
+  storeValidation,
+  updateValidation,
+} from "./ticket.validator.js";
 
 const router = Router();
 
@@ -9,15 +13,15 @@ const router = Router();
 router.get("/", authMiddleware, index);
 
 // Get a user by id
-router.get("/:id", authMiddleware, show);
+router.get("/:id", idValidation, authMiddleware, show);
 
 // Create a new user
-router.post("/", ticketValidation, validateResult, authMiddleware, store);
+router.post("/", storeValidation, authMiddleware, store);
 
 // Update a user
-router.put("/:id", authMiddleware, update);
+router.put("/:id", updateValidation, authMiddleware, update);
 
 // Delete a user
-router.delete("/:id", authMiddleware, destroy);
+router.delete("/:id", idValidation, authMiddleware, destroy);
 
 export default router;

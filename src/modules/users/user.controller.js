@@ -1,63 +1,44 @@
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import {
-  createService,
-  getAll,
-  getById,
-  updateService,
-  deleteService,
+  createUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
 } from "./user.service.js";
 
-export const index = async (req, res, next) => {
-  try {
-    const users = await getAll();
+export const index = asyncHandler(async (req, res, next) => {
+  const users = await getAllUsers();
 
-    res.status(200).json({ data: users });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(200).json({ data: users });
+});
 
-export const show = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+export const show = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
 
-    const user = await getById(id);
+  const user = await getUserById(id);
 
-    res.status(200).json({ data: user });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(200).json({ data: user });
+});
 
-export const store = async (req, res, next) => {
-  try {
-    const user = await createService(req.body);
+export const store = asyncHandler(async (req, res, next) => {
+  const user = await createUser(req.body);
 
-    res.status(201).json({ data: user });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(201).json({ data: user });
+});
 
-export const update = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+export const update = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
 
-    const user = await updateService(id, req.body);
+  const user = await updateUser(id, req.body);
 
-    res.status(200).json({ data: user });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(200).json({ data: user });
+});
 
-export const destroy = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+export const destroy = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
 
-    await deleteService(id);
+  await deleteUser(id);
 
-    res.status(204).json();
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(204).json();
+});

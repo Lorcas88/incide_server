@@ -1,45 +1,35 @@
 import bcrypt from "bcrypt";
-import {
-  all,
-  find,
-  findByEmail,
-  create,
-  updateById,
-  deleteById,
-} from "./user.model.js";
+import User from "./user.model.js";
+import AppError from "../../utils/AppError.js";
 
-export const getAll = async () => {
-  return all();
+const userModel = new User();
+
+export const getAllUsers = async () => {
+  return userModel.all();
 };
 
-export const getById = async (id) => {
-  const user = await find(id);
+export const getUserById = async (id) => {
+  const user = await userModel.find(id);
   if (!user) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
   return user;
 };
 
-export const createService = async ({
+export const createUser = async ({
   first_name,
   last_name,
   email,
   password,
   role_id,
 }) => {
-  const existingUser = await findByEmail(email);
-  if (existingUser) {
-    const error = new Error("Usuario ya existe");
-    error.statusCode = 409;
-    error.code = "DUPLICATE_ENTRY";
-    throw error;
+  const user = await userModel.findByEmail(email);
+  if (user) {
+    throw new AppError("Usuario ya existe", "DUPLICATE_ENTRY", 409);
   }
 
-  return await create({
+  return await userModel.create({
     first_name,
     last_name,
     email: email.toLowerCase().trim(),
@@ -48,26 +38,20 @@ export const createService = async ({
   });
 };
 
-export const updateService = async (id, data) => {
-  const exist = await find(id);
-  if (!exist) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+export const updateUser = async (id, data) => {
+  const user = await userModel.find(id);
+  if (!user) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return await updateById(id, data);
+  return await userModel.update(id, data);
 };
 
-export const deleteService = async (id) => {
-  const exist = await find(id);
-  if (!exist) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+export const deleteUser = async (id) => {
+  const user = await userModel.find(id);
+  if (!user) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return await deleteById(id);
+  return await userModel.delete(id);
 };

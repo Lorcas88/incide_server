@@ -1,49 +1,43 @@
-import { all, find, create, updateById, deleteById } from "./ticket.model.js";
+import Ticket from "./ticket.model.js";
+import AppError from "../../utils/AppError.js";
 
-export const getAll = async () => {
-  return all();
+const ticketModel = new Ticket();
+
+export const getAllTickets = async () => {
+  return ticketModel.all();
 };
 
-export const getById = async (id) => {
-  const user = await find(id);
-  if (!user) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+export const getTicketById = async (id) => {
+  const ticket = await ticketModel.find(id);
+  if (!ticket) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return user;
+  return ticket;
 };
 
-export const createService = async ({ title, description }, created_by) => {
-  return await create({
+export const createTicket = async ({ title, description }, created_by) => {
+  return await ticketModel.create({
     title,
     description,
     created_by,
   });
 };
 
-export const updateService = async (id, data) => {
-  const exist = await find(id);
+export const updateTicket = async (id, data) => {
+  const exist = await ticketModel.find(id);
   if (!exist) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return await updateById(id, data);
+  return await ticketModel.update(id, data);
 };
 
-export const deleteService = async (id) => {
-  const exist = await find(id);
-  if (!exist) {
-    const error = new Error("Registro no encontrado");
-    error.statusCode = 404;
-    error.code = "NOT_FOUND";
-    throw error;
+export const deleteTicket = async (id) => {
+  const ticket = await ticketModel.find(id);
+  if (!ticket) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return await deleteById(id);
+  return await ticketModel.delete(id);
 };

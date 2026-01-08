@@ -1,7 +1,29 @@
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
+
+// Middleware para manejar errores de validación
+export const validateResult = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      errors: errors.array().map((err) => ({
+        field: err.path,
+        message: err.msg,
+      })),
+    });
+  }
+
+  next();
+};
 
 // Reglas de validación para el registro de usuarios
-export const userValidation = [
+export const idValidation = [
+  param("id").isInt().withMessage("El ID debe ser un número entero"),
+
+  validateResult,
+];
+
+export const storeValidation = [
   body("first_name")
     .trim()
     .notEmpty()
@@ -36,7 +58,7 @@ export const userValidation = [
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {
-      if (value !== req.body.password_confirmation) {
+      if (value !== req.body.password) {
         throw new Error("Las contraseñas no coinciden");
       }
 
@@ -51,9 +73,27 @@ export const userValidation = [
     .withMessage("El rol debe ser un número entre el 1 y 3"),
 ];
 
-// Reglas de validación para el login de usuarios
-export const loginValidation = [
+export const updateValidation = [
+  idValidation,
+
+  body("first_name")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("El nombre es requerido")
+    .isLength({ min: 3, max: 50 })
+    .withMessage("El nombre debe tener entre 3 y 50 caracteres"),
+
+  body("last_name")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("El apellido es requerido")
+    .isLength({ min: 3, max: 50 })
+    .withMessage("El apellido debe tener entre 3 y 50 caracteres"),
+
   body("email")
+    .optional()
     .trim()
     .notEmpty()
     .withMessage("El email es requerido")
@@ -61,21 +101,32 @@ export const loginValidation = [
     .withMessage("Debe ser un email válido")
     .normalizeEmail(),
 
-  body("password").notEmpty().withMessage("La contraseña es requerida"),
+  body("password")
+    .optional()
+    .notEmpty()
+    .withMessage("La contraseña es requerida")
+    .isStrongPassword()
+    .withMessage(
+      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo"
+    ),
+
+  body("password_confirmation")
+    .optional()
+    .notEmpty()
+    .withMessage("La confirmación de contraseña es requerida")
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Las contraseñas no coinciden");
+      }
+
+      return true;
+    }),
+
+  body("role_id")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("El rol es requerido")
+    .isInt({ min: 1, max: 3 })
+    .withMessage("El rol debe ser un número entre el 1 y 3"),
 ];
-
-// Middleware para manejar errores de validación
-export const validateResult = (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
-    });
-  }
-
-  next();
-};

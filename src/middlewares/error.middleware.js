@@ -1,19 +1,26 @@
 export const errorHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || "error";
 
-  console.log(err);
-
-  res.status(statusCode).json({
-    code: err.code || "INTERNAL_SERVER_ERROR",
-    message: err.message || "Error interno del servidor",
-  });
+  if (process.env.NODE_ENV === "development") {
+    res.status(err.statusCode).json({
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+  } else {
+    // Production
+    if (err.isOperational) {
+      res.status(err.statusCode).json({
+        message: err.message,
+      });
+    } else {
+      // Programming or other unknown error: don't leak details
+      console.error("ERROR 💥", err);
+      res.status(500).json({
+        status: "error",
+        message: "Algo salió mal",
+      });
+    }
+  }
 };
-
-// if (err.code === "ER_DUP_ENTRY") {
-//       return res.status(409).json({
-//         error: {
-//           code: "DUPLICATE_ENTRY",
-//           message: "El email ya está registrado",
-//         },
-//       });
-//     }

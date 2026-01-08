@@ -1,48 +1,33 @@
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import {
-  registerService,
-  loginService,
-  deleteService,
-  getById,
+  registerUser,
+  loginUser,
+  deleteUser,
+  getUserById,
 } from "./auth.service.js";
 
-export const register = async (req, res, next) => {
-  try {
-    const user = await registerService(req.body);
+export const register = asyncHandler(async (req, res, next) => {
+  const user = await registerUser(req.body);
 
-    res.status(201).json({ data: user });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(201).json({ data: user });
+});
 
-export const login = async (req, res, next) => {
-  try {
-    const token = await loginService(req.body);
+export const login = asyncHandler(async (req, res, next) => {
+  const token = await loginUser(req.body);
 
-    res.status(200).json({ token });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(200).json({ token });
+});
 
-export const me = async (req, res, next) => {
-  try {
-    const user = await getById(req.user.id);
+export const me = asyncHandler(async (req, res, next) => {
+  const user = await getUserById(req.user.id);
 
-    res.status(201).json({ user });
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(200).json({ user });
+});
 
-export const destroy = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+export const destroy = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
 
-    await deleteService(id);
+  await deleteUser(id);
 
-    res.status(204).json();
-  } catch (err) {
-    next(err);
-  }
-};
+  res.status(204).json();
+});

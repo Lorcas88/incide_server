@@ -1,5 +1,21 @@
 import { body, validationResult } from "express-validator";
 
+// Middleware para manejar errores de validación
+export const validateResult = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      errors: errors.array().map((err) => ({
+        field: err.path,
+        message: err.msg,
+      })),
+    });
+  }
+
+  next();
+};
+
 // Reglas de validación para el registro de usuarios
 export const registerValidation = [
   body("first_name")
@@ -36,12 +52,14 @@ export const registerValidation = [
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {
-      if (value !== req.body.password_confirmation) {
+      if (value !== req.body.password) {
         throw new Error("Las contraseñas no coinciden");
       }
 
       return true;
     }),
+
+  validateResult,
 ];
 
 // Reglas de validación para el login de usuarios
@@ -55,20 +73,6 @@ export const loginValidation = [
     .normalizeEmail(),
 
   body("password").notEmpty().withMessage("La contraseña es requerida"),
+
+  validateResult,
 ];
-
-// Middleware para manejar errores de validación
-export const validateResult = (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
-    });
-  }
-
-  next();
-};

@@ -1,10 +1,11 @@
 import app from "./app.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import { config } from "./config/config.js";
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const port = config.server.port;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });

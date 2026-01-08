@@ -1,19 +1,4 @@
-import { body, validationResult } from "express-validator";
-
-// Reglas de validación para el registro de usuarios
-export const ticketValidation = [
-  body("title")
-    .trim()
-    .notEmpty()
-    .withMessage("El título es requerido")
-    .isLength({ max: 150 })
-    .withMessage("El título no debe tener mas de 150 caracteres"),
-
-  body("description")
-    .trim()
-    .notEmpty()
-    .withMessage("La descripción es requerida"),
-];
+import { body, param, validationResult } from "express-validator";
 
 // Middleware para manejar errores de validación
 export const validateResult = (req, res, next) => {
@@ -30,3 +15,49 @@ export const validateResult = (req, res, next) => {
 
   next();
 };
+
+export const idValidation = [
+  param("id").isInt().withMessage("El ID debe ser un número entero"),
+
+  validateResult,
+];
+
+export const storeValidation = [
+  body("title")
+    .trim()
+    .notEmpty()
+    .escape()
+    .withMessage("El título es requerido")
+    .isLength({ max: 150 })
+    .withMessage("El título no debe tener mas de 150 caracteres"),
+
+  body("description")
+    .trim()
+    .notEmpty()
+    .escape()
+    .withMessage("La descripción es requerida"),
+
+  validateResult,
+];
+
+export const updateValidation = [
+  idValidation,
+
+  body("title")
+    .optional()
+    .trim()
+    .notEmpty()
+    .escape()
+    .withMessage("El título es requerido")
+    .isLength({ max: 150 })
+    .withMessage("El título no debe tener mas de 150 caracteres"),
+
+  body("description")
+    .optional()
+    .trim()
+    .notEmpty()
+    .escape()
+    .withMessage("La descripción es requerida"),
+
+  validateResult,
+];
