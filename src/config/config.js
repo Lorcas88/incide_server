@@ -39,4 +39,10 @@ export const config = {
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 100,
   },
+  cookies: {
+    httpOnly: true,
+    secure: true, // obligatorio en HTTPS
+    sameSite: "lax", // o "none" si es cross-site
+    maxAge: 1000 * 60 * 15, // 15 minutos, por ejemplo
+  },
 };

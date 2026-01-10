@@ -1,3 +1,4 @@
+import { config } from "../../config/config.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import {
   registerUser,
@@ -15,14 +16,10 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const token = await loginUser(req.body);
 
-  res.cookie("auth_token", token, {
-    httpOnly: true,
-    secure: true, // obligatorio en HTTPS
-    sameSite: "lax", // o "none" si es cross-site
-    maxAge: 1000 * 60 * 15, // 15 minutos, por ejemplo
-  });
-
-  res.status(200).json({ ok: true });
+  res
+    .cookie("auth_token", token, config.cookies)
+    .status(200)
+    .json({ ok: true });
 });
 
 export const me = asyncHandler(async (req, res) => {
@@ -34,5 +31,9 @@ export const me = asyncHandler(async (req, res) => {
 export const destroy = asyncHandler(async (req, res) => {
   await deleteUser(req.user.id);
 
-  res.status(204).json();
+  res.sendStatus(204);
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie("auth_token", config.cookies).sendStatus(200);
 });
