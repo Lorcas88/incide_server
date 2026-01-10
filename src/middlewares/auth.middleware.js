@@ -3,12 +3,8 @@ import { config } from "../config/config.js";
 import AppError from "../utils/AppError.js";
 
 export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) throw new AppError("Token requerido", "TOKEN_REQUIRED", 401);
-
-  // To obtain only the token and not the Bearer word included on the request
-  const token = authHeader.split(" ")[1];
+  const token = req.cookies.auth_token;
+  if (!token) throw new AppError("Token requerido", "TOKEN_REQUIRED", 401);
 
   try {
     const payload = jwt.verify(token, config.security.jwtSecret);

@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 import specs from "./config/swagger.js";
@@ -19,6 +20,9 @@ app.use(helmet());
 
 // Habilitar CORS
 app.use(cors(config.cors));
+
+// Cookie Parsing
+app.use(cookieParser());
 
 // JSON Parsing
 app.use(express.json());
