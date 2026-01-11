@@ -36,19 +36,24 @@ export const registerUser = async ({
 
 export const loginUser = async ({ email, password }) => {
   const user = await userModel.findByEmail(email);
-  if (!user) {
-    throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
-  }
 
-  const isValidPassword = await bcrypt.compare(password, user.password);
-  if (!isValidPassword) {
+  // Prevention of Timing Attack (User Enumeration)
+  // We compare the password against the user's password OR a dummy hash
+  // This ensures the operation takes roughly the same time whether the user exists or not.
+  const passwordToCompare = user
+    ? user.password
+    : "$2b$10$0Qfa/aqTaPt4Ba1o6mnBjeafYW.klPCItg6r.A/7L0opfuOkfIIRy"; // Dummy hash
+
+  const isValidPassword = await bcrypt.compare(password, passwordToCompare);
+
+  if (!user || !isValidPassword) {
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
   return jwt.sign(
     { sub: user.id, role_id: user.role_id },
     config.security.jwtSecret,
-    { expiresIn: config.security.jwtExpiration }
+    { expiresIn: config.security.jwtExpiration },
   );
 };
 
