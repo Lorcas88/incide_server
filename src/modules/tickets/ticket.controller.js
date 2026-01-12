@@ -30,7 +30,7 @@ export const store = asyncHandler(async (req, res) => {
 export const update = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const ticket = await updateTicket(id, req.body);
+  const ticket = await updateTicket(id, req.body, req.user.id);
 
   res.status(200).json({ data: ticket });
 });
@@ -38,7 +38,7 @@ export const update = asyncHandler(async (req, res) => {
 export const destroy = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  await deleteTicket(id);
+  await deleteTicket(id, req.user.id);
 
   res.status(204).json();
 });
