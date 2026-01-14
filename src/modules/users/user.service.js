@@ -46,7 +46,17 @@ export const updateUser = async (id, data) => {
     throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
 
-  return await userModel.update(id, data);
+  const updateData = { ...data };
+
+  if (updateData.email) {
+    updateData.email = updateData.email.toLowerCase().trim();
+  }
+
+  if (updateData.password) {
+    updateData.password = await bcrypt.hash(updateData.password, 10);
+  }
+
+  return await userModel.update(id, updateData);
 };
 
 export const deleteUser = async (id) => {
