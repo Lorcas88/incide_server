@@ -8,7 +8,7 @@ import {
 } from "./ticket.service.js";
 
 export const index = asyncHandler(async (req, res) => {
-  const tickets = await getAllTickets();
+  const tickets = await getAllTickets(req.user);
 
   res.status(200).json({ data: tickets });
 });
