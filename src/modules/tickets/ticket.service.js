@@ -1,10 +1,16 @@
 import Ticket from "./ticket.model.js";
+import Role from "../roles/role.model.js";
 import AppError from "../../utils/AppError.js";
 
 const ticketModel = new Ticket();
+const roleModel = new Role();
 
-export const getAllTickets = async () => {
-  return ticketModel.all();
+export const getAllTickets = async (user) => {
+  const role = await roleModel.find(user.role_id);
+  if (role && role.name === "admin") {
+    return ticketModel.all();
+  }
+  return ticketModel.findByCreator(user.id);
 };
 
 export const getTicketById = async (id) => {
