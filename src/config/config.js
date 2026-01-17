@@ -39,6 +39,17 @@ export const config = {
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 100,
   },
+  authRateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5,
+    message: {
+      error: {
+        code: "TOO_MANY_REQUESTS",
+        message:
+          "Has excedido el límite de intentos de inicio de sesión. Intenta más tarde.",
+      },
+    },
+  },
   cookies: {
     httpOnly: true,
     secure: true, // obligatorio en HTTPS
