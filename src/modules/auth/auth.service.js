@@ -45,11 +45,13 @@ export const loginUser = async ({ email, password }) => {
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
-  return jwt.sign(
+  const accessToken = jwt.sign(
     { sub: user.id, role_id: user.role_id },
     config.security.jwtSecret,
-    { expiresIn: config.security.jwtExpiration }
+    { expiresIn: config.security.jwtExpiration },
   );
+
+  return { accessToken, user_id: user.id };
 };
 
 // Para otra version se adaptará la lógica de baja de usuario
