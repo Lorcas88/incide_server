@@ -52,6 +52,12 @@ class BaseModel {
     return hidden[0] || null;
   }
 
+  async findRaw(id) {
+    const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
+    const [result] = await pool.query(sql, [id]);
+    return result[0] || null;
+  }
+
   async create(data) {
     const filtered = this.isFillable(data);
     const columns = Object.keys(filtered).join(", ");
