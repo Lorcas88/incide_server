@@ -11,7 +11,6 @@ class User extends BaseModel {
     "is_active",
     "role_id",
   ];
-  static hidden = ["password", "role_id"];
 
   async all() {
     const sql = `
@@ -20,7 +19,7 @@ class User extends BaseModel {
       LEFT JOIN roles ON ${this.table}.role_id = roles.id
     `;
     const [rows] = await this.pool.query(sql);
-    return this.toArray(rows);
+    return rows;
   }
 
   async find(id) {
@@ -31,8 +30,7 @@ class User extends BaseModel {
       WHERE ${this.table}.id = ?
     `;
     const [rows] = await this.pool.query(sql, [id]);
-    const result = this.toArray(rows);
-    return result[0] || null;
+    return rows[0] || null;
   }
 
   async findByEmail(email) {
@@ -41,8 +39,8 @@ class User extends BaseModel {
       FROM ${this.table}
       WHERE email = ?
     `;
-    const [result] = await this.pool.query(sql, [email]);
-    return result[0] || null;
+    const [rows] = await this.pool.query(sql, [email]);
+    return rows[0] || null;
   }
 }
 

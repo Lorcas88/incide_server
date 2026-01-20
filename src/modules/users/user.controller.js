@@ -1,4 +1,5 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import { serialize } from "../../utils/utils.js";
 import {
   createUser,
   getAllUsers,
@@ -7,10 +8,12 @@ import {
   deleteUser,
 } from "./user.service.js";
 
+const hidden = ["password", "role_id"];
+
 export const index = asyncHandler(async (req, res) => {
   const users = await getAllUsers();
 
-  res.status(200).json({ data: users });
+  res.status(200).json({ data: serialize(users, hidden) });
 });
 
 export const show = asyncHandler(async (req, res) => {
@@ -18,13 +21,13 @@ export const show = asyncHandler(async (req, res) => {
 
   const user = await getUserById(id);
 
-  res.status(200).json({ data: user });
+  res.status(200).json({ data: serialize(user, hidden) });
 });
 
 export const store = asyncHandler(async (req, res) => {
   const user = await createUser(req.body);
 
-  res.status(201).json({ data: user });
+  res.status(201).json({ data: serialize(user, hidden) });
 });
 
 export const update = asyncHandler(async (req, res) => {
@@ -32,7 +35,7 @@ export const update = asyncHandler(async (req, res) => {
 
   const user = await updateUser(id, req.body);
 
-  res.status(200).json({ data: user });
+  res.status(200).json({ data: serialize(user, hidden) });
 });
 
 export const destroy = asyncHandler(async (req, res) => {

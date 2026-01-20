@@ -9,3 +9,19 @@ export const addDays = (days) => {
   newDate.setDate(newDate.getDate() + days);
   return newDate;
 };
+
+export const serialize = (data, fields) => {
+  // If data is a single object (not an array)
+  if (!Array.isArray(data)) {
+    const copy = { ...data };
+    fields.forEach((f) => delete copy[f]);
+    return copy;
+  }
+
+  // If data is an array of objects
+  return data.map((item) => {
+    const copy = { ...item };
+    fields.forEach((f) => delete copy[f]);
+    return copy;
+  });
+};

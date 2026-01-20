@@ -129,17 +129,31 @@ This separation ensures:
 4. **Create the database**
 
    ```bash
-   # Create database and tables (SQL script needed)
-   mysql -u root -p < database/schema.sql
+   mysql -u root -p -e "CREATE DATABASE incide_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
    ```
 
-5. **Run in development mode**
+5. **Run database migrations**
+
+   ```bash
+   npm run migrate
+   ```
+
+   This will:
+   - Create all necessary tables (roles, ticket_status, users, tickets, refresh_tokens)
+   - Insert seed data (roles and ticket statuses)
+   - Create test users:
+     - `admin@incide.com` / `Admin123!` (Admin role)
+     - `support@incide.com` / `Support123!` (Support role)
+     - `john@example.com` / `User123!` (User role)
+
+6. **Run in development mode**
 
    ```bash
    npm run dev
    ```
 
-6. **Run tests**
+7. **Run tests**
+
    ```bash
    npm test
    ```
@@ -148,24 +162,31 @@ The server will start on `http://localhost:3000`
 
 ### Quick Test
 
+Use one of the test users created by migrations:
+
 ```bash
-# Register a new user
-curl -X POST http://localhost:3000/api/v1/auth/register \
+# Login as Admin
+curl -X POST http://localhost:3000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john@example.com",
-    "password": "Password123!",
-    "password_confirmation": "Password123!"
+    "email": "admin@incide.com",
+    "password": "Admin123!"
   }'
 
-# Login
+# Login as Support
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "support@incide.com",
+    "password": "Support123!"
+  }'
+
+# Login as User
 curl -X POST http://localhost:3000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
-    "password": "Password123!"
+    "password": "User123!"
   }'
 ```
 
@@ -190,11 +211,34 @@ http://localhost:3000/api-docs
 
 #### Tickets
 
-- `GET /api/v1/tickets` - List tickets (filtered by role)
-- `GET /api/v1/tickets/:id` - Get ticket details
-- `POST /api/v1/tickets` - Create new ticket
-- `PUT /api/v1/tickets/:id` - Update ticket
+**Admin Only:**
+
+- `GET /api/v1/tickets` - List all tickets
 - `DELETE /api/v1/tickets/:id` - Delete ticket
+- `PATCH /api/v1/tickets/:id/assign` - Assign ticket to support user
+
+**Support Only:**
+
+- `GET /api/v1/tickets/assigned` - List tickets assigned to me
+- `GET /api/v1/tickets/without_assignment` - List unassigned tickets
+- `PATCH /api/v1/tickets/:id/self_assign` - Self-assign an unassigned ticket
+
+**User Only:**
+
+- `GET /api/v1/tickets/created_by` - List tickets created by me
+
+**Admin + User:**
+
+- `POST /api/v1/tickets` - Create new ticket
+
+**Admin + Support:**
+
+- `PUT /api/v1/tickets/:id` - Update ticket details
+- `PATCH /api/v1/tickets/:id/change_status` - Change ticket status
+
+**All Roles (with permission validation):**
+
+- `GET /api/v1/tickets/:id` - Get ticket details (if authorized)
 
 #### Users (Admin only)
 
@@ -204,29 +248,49 @@ http://localhost:3000/api-docs
 - `PUT /api/v1/users/:id` - Update user
 - `DELETE /api/v1/users/:id` - Delete user
 
-### Business Rules
+### Role-Based Permissions
 
-**Regular Users:**
+The system implements three user roles with different permission levels:
 
-- Create tickets
-- View only their own tickets
-- Cannot change ticket status
-- Cannot view other users' tickets
+**Role Hierarchy:**
 
-**Admin Users:**
+- **Admin (role_id: 1)** - Full system access
+- **Support (role_id: 2)** - Ticket management and resolution
+- **User (role_id: 3)** - Ticket creation and viewing
 
-- View all tickets
-- Change ticket status
-- Manage users
-- Full CRUD on all resources
+**Permissions Matrix:**
+
+| Action                | Admin | Support             | User |
+| --------------------- | ----- | ------------------- | ---- |
+| View all tickets      | Yes   | No                  | No   |
+| View assigned tickets | Yes   | Yes                 | No   |
+| View created tickets  | Yes   | No                  | Yes  |
+| Create ticket         | Yes   | No                  | Yes  |
+| Update ticket         | Yes   | Yes (only assigned) | No   |
+| Self-assign ticket    | Yes   | Yes (if unassigned) | No   |
+| Assign to other user  | Yes   | No                  | No   |
+| Change ticket status  | Yes   | Yes (only assigned) | No   |
+| Delete ticket         | Yes   | No                  | No   |
+
+**Business Rules:**
+
+- **Users** can create tickets and view only tickets they created
+- **Support** can view and resolve tickets assigned to them, and self-assign unassigned tickets
+- **Admins** have full CRUD access to all tickets and can assign tickets to support users
+- All authorization checks are enforced in the service layer using the Policy pattern
 
 **Status Workflow:**
 
+Ticket statuses follow a linear progression that is validated at the service layer:
+
 ```
-open → in_progress → closed
+open (1) → in_progress (2) → closed (3)
 ```
 
-Invalid transitions are rejected by the service layer.
+- Invalid transitions are automatically rejected
+- Only Admin and Support (for assigned tickets) can change status
+- Status constants are defined in `ticket_status.constants.js`
+- Workflow validation is implemented in `ticket-status.workflow.js`
 
 ## Security
 

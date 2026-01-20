@@ -1,6 +1,6 @@
 import { config } from "../../config/config.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { addDays } from "../../utils/utils.js";
+import { addDays, serialize } from "../../utils/utils.js";
 import {
   registerUser,
   loginUser,
@@ -14,10 +14,12 @@ import {
   revokeAllForUser,
 } from "./refreshToken.service.js";
 
+const hidden = ["password", "role_id"];
+
 export const register = asyncHandler(async (req, res) => {
   const user = await registerUser(req.body);
 
-  res.status(201).json({ data: user });
+  res.status(201).json({ data: serialize(user, hidden) });
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -48,7 +50,7 @@ export const refresh = asyncHandler(async (req, res) => {
 export const me = asyncHandler(async (req, res) => {
   const user = await getUserById(req.user.id);
 
-  res.status(200).json({ data: user });
+  res.status(200).json({ data: serialize(user, hidden) });
 });
 
 export const destroy = asyncHandler(async (req, res) => {

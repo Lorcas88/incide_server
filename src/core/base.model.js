@@ -1,9 +1,6 @@
 import pool from "../config/db.js";
 
 class BaseModel {
-  //   constructor() {
-  //     this.table = table;
-  //   }
   constructor() {
     this.table = this.constructor.table;
     this.pool = pool;
@@ -24,32 +21,16 @@ class BaseModel {
     return filtered;
   }
 
-  toArray(data) {
-    const { hidden } = this.constructor;
-    if (!Array.isArray(hidden) || !Array.isArray(data)) return data;
-
-    // Iterates the data and clone it into newItem with Spread, to avoid pointing
-    // the same object. Then, hidden is iterated to mutate values on newItem
-    return data.map((item) => {
-      const newItem = { ...item };
-      hidden.forEach((field) => delete newItem[field]);
-      return newItem;
-    });
-  }
-
   async all() {
     const sql = `SELECT * FROM ${this.table}`;
-    const [result] = await pool.query(sql);
-    // return result;
-    return this.toArray(result);
+    const [rows] = await pool.query(sql);
+    return rows;
   }
 
   async find(id) {
     const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
-    const [result] = await pool.query(sql, [id]);
-    // return result[0] || null;
-    const hidden = this.toArray(result);
-    return hidden[0] || null;
+    const [rows] = await pool.query(sql, [id]);
+    return rows[0] || null;
   }
 
   async create(data) {

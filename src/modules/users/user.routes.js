@@ -6,23 +6,42 @@ import {
   storeValidation,
   updateValidation,
 } from "./user.validator.js";
+import { ROLES } from "../roles/role.constants.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
 
 const router = Router();
 
 // Get all users
-router.get("/", authMiddleware, authorize(1), index);
+router.get("/", authMiddleware, authorize(ROLES.ADMIN), index);
 
 // Get a user by id
-router.get("/:id", idValidation, authMiddleware, authorize(1), show);
+router.get("/:id", authMiddleware, authorize(ROLES.ADMIN), idValidation, show);
 
 // Create a new user
-router.post("/", storeValidation, authMiddleware, authorize(1), store);
+router.post(
+  "/",
+  authMiddleware,
+  authorize(ROLES.ADMIN),
+  storeValidation,
+  store,
+);
 
 // Update a user
-router.put("/:id", updateValidation, authMiddleware, authorize(1), update);
+router.put(
+  "/:id",
+  authMiddleware,
+  authorize(ROLES.ADMIN),
+  updateValidation,
+  update,
+);
 
 // Delete a user
-router.delete("/:id", idValidation, authMiddleware, authorize(1), destroy);
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorize(ROLES.ADMIN),
+  idValidation,
+  destroy,
+);
 
 export default router;
