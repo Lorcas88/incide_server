@@ -62,7 +62,17 @@ export const updateTicket = async (id, data, user) => {
     throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
   }
 
-  return await ticketModel.update(id, data);
+  // Whitelist allowed fields to prevent Mass Assignment of status/creator
+  const allowedFields = ["title", "description"];
+  const updateData = {};
+
+  allowedFields.forEach((field) => {
+    if (Object.hasOwn(data, field)) {
+      updateData[field] = data[field];
+    }
+  });
+
+  return await ticketModel.update(id, updateData);
 };
 
 export const selfAssignTicket = async (id, user) => {
