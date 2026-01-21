@@ -43,6 +43,6 @@ export const config = {
     httpOnly: true,
     secure: true, // obligatorio en HTTPS
     sameSite: "lax", // o "none" si es cross-site
-    maxAge: 1000 * 60 * 15, // 15 minutos, por ejemplo
+    maxAge: 1000 * 60 * 60 * 24 * 7, // Must match refresh token TTL in the database
   },
 };

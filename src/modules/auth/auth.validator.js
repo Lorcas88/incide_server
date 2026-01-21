@@ -45,7 +45,7 @@ export const registerValidation = [
     .withMessage("La contraseña es requerida")
     .isStrongPassword()
     .withMessage(
-      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo"
+      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
     ),
 
   body("password_confirmation")
@@ -73,6 +73,33 @@ export const loginValidation = [
     .normalizeEmail(),
 
   body("password").notEmpty().withMessage("La contraseña es requerida"),
+
+  validateResult,
+];
+
+// Rules of validation to change password
+export const changePasswordValidation = [
+  body("old_password").notEmpty().withMessage("La contraseña es requerida"),
+
+  body("new_password")
+    .trim()
+    .notEmpty()
+    .withMessage("La contraseña es requerida")
+    .isStrongPassword()
+    .withMessage(
+      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
+    ),
+
+  body("password_confirmation")
+    .notEmpty()
+    .withMessage("La confirmación de contraseña es requerida")
+    .custom((value, { req }) => {
+      if (value !== req.body.new_password) {
+        throw new Error("Las contraseñas no coinciden");
+      }
+
+      return true;
+    }),
 
   validateResult,
 ];

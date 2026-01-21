@@ -6,6 +6,7 @@ import {
   loginUser,
   deleteUser,
   getUserById,
+  changePasswordUser,
 } from "./auth.service.js";
 import {
   refreshToken,
@@ -45,6 +46,14 @@ export const refresh = asyncHandler(async (req, res) => {
       path: "/api/v1/auth/refresh",
     })
     .json({ data: { token: token.access_token } });
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const user = await changePasswordUser(req.user.id, req.body);
+
+  await revokeAllForUser(req.user.id);
+
+  res.json({ data: serialize(user, hidden) });
 });
 
 export const me = asyncHandler(async (req, res) => {

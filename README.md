@@ -205,6 +205,7 @@ http://localhost:3000/api-docs
 - `POST /api/v1/auth/register` - Register new user
 - `POST /api/v1/auth/login` - Login and get tokens
 - `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/change-password` - Change user password (requires auth)
 - `POST /api/v1/auth/logout` - Logout and revoke token
 - `GET /api/v1/auth/me` - Get current user profile
 - `DELETE /api/v1/auth/unsubscribe` - Delete account
@@ -319,7 +320,7 @@ The system supports revoking refresh tokens in these scenarios:
 
 - User logout
 - Account deletion
-- Password change (TODO)
+- Password change (all sessions invalidated for security)
 - Suspicious activity detection (TODO)
 
 ## Testing

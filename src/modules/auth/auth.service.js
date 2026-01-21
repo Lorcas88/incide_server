@@ -54,6 +54,29 @@ export const loginUser = async ({ email, password }) => {
   return { accessToken, user_id: user.id };
 };
 
+export const changePasswordUser = async (
+  id,
+  { old_password, new_password },
+) => {
+  const user = await userModel.find(id);
+  if (!user) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
+  }
+
+  const validOldPassword = await bcrypt.compare(old_password, user.password);
+  if (!validOldPassword) {
+    throw new AppError(
+      "Contraseña anterior no es correcta",
+      "INVALID_CREDENTIALS",
+      401,
+    );
+  }
+
+  return await userModel.update(id, {
+    password: await bcrypt.hash(new_password, 10),
+  });
+};
+
 // Para otra version se adaptará la lógica de baja de usuario
 export const deleteUser = async (id) => {
   const exist = await userModel.find(id);
