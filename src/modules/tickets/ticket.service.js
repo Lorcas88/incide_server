@@ -62,6 +62,11 @@ export const updateTicket = async (id, data, user) => {
     throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
   }
 
+  // The property "ticket_status_id", only can change from the endpoint change_status
+  if (Object.hasOwn(data, "ticket_status_id")) {
+    throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
+  }
+
   return await ticketModel.update(id, data);
 };
 
