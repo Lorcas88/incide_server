@@ -21,15 +21,7 @@ export const assignValidation = [
     .notEmpty()
     .withMessage("El assigned_to es requerido")
     .isInt()
-    .withMessage("El assigned_to debe ser un número entero")
-    .custom((value, { req }) => {
-      // Ensure only assigned_to is in the body
-      const bodyKeys = Object.keys(req.body);
-      if (bodyKeys.length !== 1 || !bodyKeys.includes("assigned_to")) {
-        throw new Error("Solo se permite el campo assigned_to");
-      }
-      return true;
-    }),
+    .withMessage("El assigned_to debe ser un número entero"),
 
   validateResult,
 ];
@@ -39,15 +31,7 @@ export const changeStatusValidation = [
     .notEmpty()
     .withMessage("El ticket_status_id es requerido")
     .isInt()
-    .withMessage("El ticket_status_id debe ser un número entero")
-    .custom((value, { req }) => {
-      // Ensure only ticket_status_id is in the body
-      const bodyKeys = Object.keys(req.body);
-      if (bodyKeys.length !== 1 || !bodyKeys.includes("ticket_status_id")) {
-        throw new Error("Solo se permite el campo ticket_status_id");
-      }
-      return true;
-    }),
+    .withMessage("El ticket_status_id debe ser un número entero"),
 
   validateResult,
 ];

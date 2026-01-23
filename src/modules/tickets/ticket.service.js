@@ -57,12 +57,16 @@ export const updateTicket = async (id, data, user) => {
     throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
   }
 
-  // The property "assigned_to", only can change from the endpoint assign
-  if (Object.hasOwn(data, "assigned_to")) {
-    throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
-  }
+  // First, it's set an array that contains the updatable fields,
+  // then the data object is changed to an array, to evaluate if
+  // it contains values from the updatable array. Finally, the
+  // array is restore as an object. This was made to allow partial update.
+  const updatable = ["title", "description"];
+  const dataFilter = Object.fromEntries(
+    Object.entries(data).filter(([key]) => updatable.includes(key)),
+  );
 
-  return await ticketModel.update(id, data);
+  return await ticketModel.update(id, dataFilter);
 };
 
 export const selfAssignTicket = async (id, user) => {
@@ -129,7 +133,9 @@ export const changeStatusTicket = async (id, data, user) => {
     );
   }
 
-  return await ticketModel.update(id, data);
+  return await ticketModel.update(id, {
+    ticket_status_id: data.ticket_status_id,
+  });
 };
 
 export const deleteTicket = async (id, user) => {

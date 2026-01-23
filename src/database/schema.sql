@@ -5,6 +5,7 @@
 
 -- Drop existing tables if they exist (for development)
 -- Order: Drop tables with foreign keys first
+DROP TABLE IF EXISTS password_reset_tokens;
 DROP TABLE IF EXISTS refresh_tokens;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS users;
@@ -132,6 +133,24 @@ CREATE TABLE refresh_tokens (
   INDEX idx_refresh_tokens_user (user_id),
   INDEX idx_refresh_tokens_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- 5. RESET PASSWORD TOKENS TABLE
+-- ============================================
+CREATE TABLE password_reset_tokens (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  token_hash VARCHAR(255) NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  used_at DATETIME NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  
+  -- Foreign Keys
+  CONSTRAINT fk_password_resets_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+);
 
 -- ============================================
 -- SEED DATA

@@ -40,7 +40,7 @@ app.use(
         message: "Has excedido el límite de solicitudes. Intenta más tarde.",
       },
     },
-  })
+  }),
 );
 
 // Logging HTTP

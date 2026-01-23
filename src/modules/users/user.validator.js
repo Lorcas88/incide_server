@@ -44,14 +44,17 @@ export const storeValidation = [
     .withMessage("El email es requerido")
     .isEmail()
     .withMessage("Debe ser un email válido")
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false,
+    }),
 
   body("password")
     .notEmpty()
     .withMessage("La contraseña es requerida")
     .isStrongPassword()
     .withMessage(
-      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo"
+      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
     ),
 
   body("password_confirmation")
@@ -99,7 +102,10 @@ export const updateValidation = [
     .withMessage("El email es requerido")
     .isEmail()
     .withMessage("Debe ser un email válido")
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false,
+    }),
 
   body("password")
     .optional()
@@ -107,7 +113,7 @@ export const updateValidation = [
     .withMessage("La contraseña es requerida")
     .isStrongPassword()
     .withMessage(
-      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo"
+      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
     ),
 
   body("password_confirmation")

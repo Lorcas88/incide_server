@@ -205,6 +205,8 @@ http://localhost:3000/api-docs
 - `POST /api/v1/auth/register` - Register new user
 - `POST /api/v1/auth/login` - Login and get tokens
 - `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/forgot-password` - Request password reset email
+- `POST /api/v1/auth/reset-password` - Reset password with token
 - `POST /api/v1/auth/change-password` - Change user password (requires auth)
 - `POST /api/v1/auth/logout` - Logout and revoke token
 - `GET /api/v1/auth/me` - Get current user profile

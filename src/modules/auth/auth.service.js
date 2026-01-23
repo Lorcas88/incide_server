@@ -66,7 +66,7 @@ export const changePasswordUser = async (
   const validOldPassword = await bcrypt.compare(old_password, user.password);
   if (!validOldPassword) {
     throw new AppError(
-      "Contraseña anterior no es correcta",
+      "La contraseña antigua no es correcta",
       "INVALID_CREDENTIALS",
       401,
     );

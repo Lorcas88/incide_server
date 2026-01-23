@@ -38,7 +38,10 @@ export const registerValidation = [
     .withMessage("El email es requerido")
     .isEmail()
     .withMessage("Debe ser un email válido")
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false,
+    }),
 
   body("password")
     .notEmpty()
@@ -70,7 +73,10 @@ export const loginValidation = [
     .withMessage("El email es requerido")
     .isEmail()
     .withMessage("Debe ser un email válido")
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false,
+    }),
 
   body("password").notEmpty().withMessage("La contraseña es requerida"),
 
@@ -79,15 +85,17 @@ export const loginValidation = [
 
 // Rules of validation to change password
 export const changePasswordValidation = [
-  body("old_password").notEmpty().withMessage("La contraseña es requerida"),
+  body("old_password")
+    .notEmpty()
+    .withMessage("La antigua contraseña es requerida"),
 
   body("new_password")
     .trim()
     .notEmpty()
-    .withMessage("La contraseña es requerida")
+    .withMessage("La nueva contraseña es requerida")
     .isStrongPassword()
     .withMessage(
-      "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
+      "La nueva contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
     ),
 
   body("password_confirmation")
@@ -95,6 +103,49 @@ export const changePasswordValidation = [
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {
       if (value !== req.body.new_password) {
+        throw new Error("Las contraseñas no coinciden");
+      }
+
+      return true;
+    }),
+
+  validateResult,
+];
+
+// Valdiation rule to reset password
+export const forgotPasswordValidation = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("El email es requerido")
+    .isEmail()
+    .withMessage("Debe ser un email válido")
+    .normalizeEmail({
+      gmail_remove_dots: false,
+      gmail_remove_subaddress: false,
+    }),
+
+  validateResult,
+];
+
+// Rules of validation to change password
+export const resetPasswordValidation = [
+  body("token").notEmpty().withMessage("El token es requerido"),
+
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("La nueva contraseña es requerida")
+    .isStrongPassword()
+    .withMessage(
+      "La nueva contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
+    ),
+
+  body("password_confirmation")
+    .notEmpty()
+    .withMessage("La confirmación de contraseña es requerida")
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
         throw new Error("Las contraseñas no coinciden");
       }
 

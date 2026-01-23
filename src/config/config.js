@@ -45,4 +45,7 @@ export const config = {
     sameSite: "lax", // o "none" si es cross-site
     maxAge: 1000 * 60 * 60 * 24 * 7, // Must match refresh token TTL in the database
   },
+  emailSender: {
+    resend: process.env.RESEND_API_KEY,
+  },
 };

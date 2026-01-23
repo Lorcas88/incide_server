@@ -4,6 +4,12 @@ export const hash = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
 };
 
+export const addMinutes = (minutes) => {
+  const newDate = new Date();
+  newDate.setMinutes(newDate.getMinutes() + minutes);
+  return newDate;
+};
+
 export const addDays = (days) => {
   const newDate = new Date();
   newDate.setDate(newDate.getDate() + days);

@@ -1,6 +1,6 @@
 import { config } from "../../config/config.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
-import { addDays, serialize } from "../../utils/utils.js";
+import { addDays, addMinutes, serialize } from "../../utils/utils.js";
 import {
   registerUser,
   loginUser,
@@ -13,7 +13,11 @@ import {
   saveToken,
   revokeToken,
   revokeAllForUser,
-} from "./refreshToken.service.js";
+} from "../refresh-tokens/refreshToken.service.js";
+import {
+  createToken,
+  resetPasswordUser,
+} from "../password-resets/passwordReset.service.js";
 
 const hidden = ["password", "role_id"];
 
@@ -48,7 +52,24 @@ export const refresh = asyncHandler(async (req, res) => {
     .json({ data: { token: token.access_token } });
 });
 
+export const forgotPassword = asyncHandler(async (req, res) => {
+  await createToken(req.body, addMinutes(15));
+  // Always return success to prevent email enumeration
+  res.status(200).json({
+    message: `Se han enviado instrucciones al correo.`,
+  });
+});
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  await resetPasswordUser(req.body);
+
+  res.status(200).json({
+    message: "Contraseña actualizada correctamente. Por favor inicia sesión.",
+  });
+});
+
 export const changePassword = asyncHandler(async (req, res) => {
+  const { token } = req.query;
   const user = await changePasswordUser(req.user.id, req.body);
 
   await revokeAllForUser(req.user.id);

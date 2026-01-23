@@ -1,6 +1,6 @@
 import app from "./app.js";
 import { config } from "./config/config.js";
-import RefreshToken from "./modules/auth/refreshToken.model.js";
+import RefreshToken from "./modules/refresh-tokens/refreshToken.model.js";
 
 const port = config.server.port;
 
