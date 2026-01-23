@@ -97,3 +97,10 @@ export const logout = asyncHandler(async (req, res) => {
     .clearCookie("refresh_token", { path: "/api/v1/auth/refresh" })
     .sendStatus(204);
 });
+
+export const logoutAll = asyncHandler(async (req, res) => {
+  await revokeAllForUser(req.user.id);
+  res
+    .clearCookie("refresh_token", { path: "/api/v1/auth/refresh" })
+    .sendStatus(204);
+});

@@ -30,10 +30,10 @@ app.use(express.json());
 // Rate limit global Aplicar rate limit a todas las rutas
 app.use(
   rateLimit({
-    windowMs: config.rateLimit.windowMs, // 15 minutos
-    max: config.rateLimit.max, // máximo 100 requests por IP en 15 minutos
-    standardHeaders: true, // devuelve info en los headers RateLimit-*
-    legacyHeaders: false, // desactiva X-RateLimit-* headers antiguos
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.max,
+    standardHeaders: true,
+    legacyHeaders: false,
     message: {
       error: {
         code: "TOO_MANY_REQUESTS",
@@ -43,8 +43,41 @@ app.use(
   }),
 );
 
-// Logging HTTP
-app.use(morgan("dev"));
+// Logging HTTP - Laravel-inspired format
+app.use(
+  morgan((tokens, req, res) => {
+    const status = tokens.status(req, res);
+    const method = tokens.method(req, res);
+    const url = tokens.url(req, res);
+    const responseTime = tokens["response-time"](req, res);
+
+    // Status text with color
+    let statusText = "";
+    if (status >= 500) {
+      statusText = `\x1b[41m ${status} \x1b[0m`; // Red background
+    } else if (status >= 400) {
+      statusText = `\x1b[43m\x1b[30m ${status} \x1b[0m`; // Yellow background, black text
+    } else if (status >= 300) {
+      statusText = `\x1b[46m\x1b[30m ${status} \x1b[0m`; // Cyan background, black text
+    } else {
+      statusText = `\x1b[42m\x1b[30m ${status} \x1b[0m`; // Green background, black text
+    }
+
+    // Method color
+    const methodColors = {
+      GET: "\x1b[36m", // Cyan
+      POST: "\x1b[32m", // Green
+      PUT: "\x1b[33m", // Yellow
+      PATCH: "\x1b[35m", // Magenta
+      DELETE: "\x1b[31m", // Red
+    };
+    const methodColor = methodColors[method] || "\x1b[37m";
+
+    const dots = ".".repeat(Math.max(2, 50 - url.length));
+
+    return `  ${methodColor}${method.padEnd(6)}\x1b[0m \x1b[90m${url}\x1b[0m ${dots} ${statusText} \x1b[90m~ ${responseTime}ms\x1b[0m`;
+  }),
+);
 
 // Documentación Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));

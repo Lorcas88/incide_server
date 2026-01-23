@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { config } from "../config/config.js";
+import logger from "../utils/logger.js";
 
 const resend = new Resend(config.emailSender.resend);
 
@@ -31,6 +32,8 @@ const createEmailTemplate = (title, content) => {
 
 export const sendForgotEmail = async (to, name, token) => {
   try {
+    const resetUrl = `${config.client.url}/reset-password?token=${token}`;
+
     // Validate email recipient
     if (!to) {
       throw new Error("Faltan campos para el correo");
@@ -45,7 +48,7 @@ export const sendForgotEmail = async (to, name, token) => {
           Enviamos este correo ya que olvidaste tu contraseña. Para ello
           debes hacer clic en el siguiente enlace e ingresar tu nueva contraseña:
         </p>
-        <a href="http://localhost:3000/reset-password?token=${token}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+        <a href="${resetUrl}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
           Reestablecer contraseña
         </a>
         <p style="margin-top: 32px; color: #6b7280; font-size: 14px;">
@@ -63,6 +66,10 @@ export const sendForgotEmail = async (to, name, token) => {
 
     return result;
   } catch (error) {
-    console.error("Error:", error);
+    logger.error("Error sending forgot password email:", {
+      message: error.message,
+      stack: error.stack,
+    });
+    throw error;
   }
 };

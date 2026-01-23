@@ -14,5 +14,17 @@ setInterval(
 );
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  const env = process.env.NODE_ENV || "development";
+  console.log("");
+  console.log(
+    `  \x1b[42m\x1b[30m INFO \x1b[0m Server running on [\x1b[36mhttp://localhost:${port}\x1b[0m]`,
+  );
+  console.log("");
+  console.log(
+    `  \x1b[90mAPI Documentation: \x1b[36mhttp://localhost:${port}/api-docs\x1b[0m`,
+  );
+  console.log(`  \x1b[90mEnvironment: \x1b[33m${env}\x1b[0m`);
+  console.log("");
+  console.log("  \x1b[90mPress Ctrl+C to stop the server\x1b[0m");
+  console.log("");
 });

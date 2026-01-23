@@ -48,4 +48,7 @@ export const config = {
   emailSender: {
     resend: process.env.RESEND_API_KEY,
   },
+  client: {
+    url: process.env.FRONTEND_URL || "http://localhost:5173",
+  },
 };

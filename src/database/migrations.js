@@ -1,20 +1,22 @@
 import fs from "fs";
 import path from "path";
 import pool from "../config/db.js";
+import logger from "../utils/logger.js";
 
 export const runMigrations = async () => {
   const schemaPath = path.resolve("src/database/schema.sql");
   const sql = fs.readFileSync(schemaPath, "utf8");
 
   try {
-    console.log("Ejecutando migraciones...");
+    logger.info("Ejecutando migraciones...");
     await pool.query(sql);
-    console.log("Migraciones ejecutadas exitosamente");
+    logger.info("Migraciones ejecutadas exitosamente");
     process.exit(0);
   } catch (err) {
-    console.error("Error ejecutando migraciones:");
-    console.error("Código:", err.code);
-    console.error("Mensaje:", err.sqlMessage || err.message);
+    logger.error("Error ejecutando migraciones:", {
+      code: err.code,
+      message: err.sqlMessage || err.message,
+    });
     process.exit(1);
   } finally {
     await pool.end();

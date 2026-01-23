@@ -44,7 +44,7 @@ A production-ready RESTful API for ticket/incident management built with Node.js
   - Interactive API documentation (Swagger/OpenAPI)
   - Comprehensive test suite (Jest + Supertest)
   - Request validation with express-validator
-  - Structured logging (Morgan + Winston)
+  - Structured logging (Winston) with environment-aware configuration
   - Hot reload in development
 
 ## Tech Stack
@@ -209,6 +209,7 @@ http://localhost:3000/api-docs
 - `POST /api/v1/auth/reset-password` - Reset password with token
 - `POST /api/v1/auth/change-password` - Change user password (requires auth)
 - `POST /api/v1/auth/logout` - Logout and revoke token
+- `POST /api/v1/auth/logout-all` - Logout from all devices
 - `GET /api/v1/auth/me` - Get current user profile
 - `DELETE /api/v1/auth/unsubscribe` - Delete account
 
@@ -310,7 +311,9 @@ open (1) → in_progress (2) → closed (3)
 - **Token Hashing**: Tokens stored as SHA-256 hashes in database
 - **HttpOnly Cookies**: Prevents XSS attacks
 - **CORS**: Configured for specific origins
-- **Rate Limiting**: 100 requests per 15 minutes
+- **Rate Limiting**:
+  - Global: 100 requests per 15 minutes
+  - Refresh Endpoint: 5 requests per 15 minutes
 - **Helmet.js**: Secure HTTP headers
 - **Password Hashing**: bcrypt with 10 rounds
 - **Input Validation**: All endpoints validated

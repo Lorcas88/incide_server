@@ -5,6 +5,7 @@ import {
   me,
   destroy,
   logout,
+  logoutAll,
   refresh,
   changePassword,
   forgotPassword,
@@ -18,6 +19,11 @@ import {
   forgotPasswordValidation,
   resetPasswordValidation,
 } from "./auth.validator.js";
+import {
+  loginLimiter,
+  resetPasswordLimiter,
+  refreshLimiter,
+} from "../../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 
@@ -25,16 +31,21 @@ const router = Router();
 router.post("/register", registerValidation, register);
 
 // Login
-router.post("/login", loginValidation, login);
+router.post("/login", loginLimiter, loginValidation, login);
 
 // Refresh token (NO authMiddleware - the access token has expired)
-router.post("/refresh", refresh);
+router.post("/refresh", refreshLimiter, refresh);
 
 // Forgot password
 router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
 
 // Reset password
-router.post("/reset-password", resetPasswordValidation, resetPassword);
+router.post(
+  "/reset-password",
+  resetPasswordLimiter,
+  resetPasswordValidation,
+  resetPassword,
+);
 
 // Change password
 router.post(
@@ -51,6 +62,9 @@ router.get("/me", authMiddleware, me);
 router.delete("/unsubscribe", authMiddleware, destroy);
 
 // Logout
-router.post("/logout", logout);
+router.post("/logout", authMiddleware, logout);
+
+// Logout
+router.post("/logout-all", authMiddleware, logoutAll);
 
 export default router;
