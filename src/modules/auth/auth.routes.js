@@ -10,6 +10,7 @@ import {
   changePassword,
   forgotPassword,
   resetPassword,
+  confirmation,
 } from "./auth.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import {
@@ -35,6 +36,9 @@ router.post("/login", loginLimiter, loginValidation, login);
 
 // Refresh token (NO authMiddleware - the access token has expired)
 router.post("/refresh", refreshLimiter, refresh);
+
+// Confirmation account
+router.post("/confirm", confirmation);
 
 // Forgot password
 router.post("/forgot-password", forgotPasswordValidation, forgotPassword);

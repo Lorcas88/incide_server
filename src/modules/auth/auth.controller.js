@@ -17,12 +17,16 @@ import {
 import {
   createToken,
   resetPasswordUser,
-} from "../password-resets/passwordReset.service.js";
+  confirmationUser,
+} from "../user-tokens/userToken.service.js";
+import { TYPES } from "../user-tokens/userToken.constants.js";
 
 const hidden = ["password", "role_id"];
 
 export const register = asyncHandler(async (req, res) => {
   const user = await registerUser(req.body);
+
+  await createToken(req.body, addMinutes(60), TYPES.EMAIL);
 
   res.status(201).json({ data: serialize(user, hidden) });
 });
@@ -52,8 +56,16 @@ export const refresh = asyncHandler(async (req, res) => {
     .json({ data: { token: token.access_token } });
 });
 
+export const confirmation = asyncHandler(async (req, res) => {
+  await confirmationUser(req.body);
+
+  res.status(200).json({
+    message: "Usuario confirmado. Por favor inicia sesión.",
+  });
+});
+
 export const forgotPassword = asyncHandler(async (req, res) => {
-  await createToken(req.body, addMinutes(15));
+  await createToken(req.body, addMinutes(15), TYPES.PASSWORD);
   // Always return success to prevent email enumeration
   res.status(200).json({
     message: `Se han enviado instrucciones al correo.`,
@@ -69,7 +81,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
-  const { token } = req.query;
   const user = await changePasswordUser(req.user.id, req.body);
 
   await revokeAllForUser(req.user.id);

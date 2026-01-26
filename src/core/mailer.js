@@ -30,6 +30,51 @@ const createEmailTemplate = (title, content) => {
   `;
 };
 
+export const sendConfirmationEmail = async (to, name, token) => {
+  try {
+    const resetUrl = `${config.client.url}/confirm?token=${token}`;
+
+    // Validate email recipient
+    if (!to) {
+      throw new Error("Faltan campos para el correo");
+    }
+
+    const content = `
+      <div style="text-align: center;">
+        <h3 style="color: #0f172a; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 16px;">
+          ¡Gracias por registrarte en Incide!
+        </h3>
+        <p style="margin-bottom: 32px; color: #4b5563;">
+          Necesitas verificar tu dirección de correo para continuar usando tu
+          cuenta de <b>Incide</b>. Ingresa el siguiente código para verificar tu
+          dirección de correo:
+        </p>
+        <a href="${resetUrl}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          Confirma tu cuenta
+        </a>
+        <p style="margin-top: 32px; color: #6b7280; font-size: 14px;">
+          Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.
+        </p>
+      </div>
+    `;
+
+    const result = await resend.emails.send({
+      from: "contacto_incide@resend.dev", // testing email
+      to: to,
+      subject: "Confirma tu cuenta en Incide",
+      html: createEmailTemplate(`¡Hola, ${name}!`, content),
+    });
+
+    return result;
+  } catch (error) {
+    logger.error("Error sending forgot password email:", {
+      message: error.message,
+      stack: error.stack,
+    });
+    throw error;
+  }
+};
+
 export const sendForgotEmail = async (to, name, token) => {
   try {
     const resetUrl = `${config.client.url}/reset-password?token=${token}`;
@@ -60,7 +105,7 @@ export const sendForgotEmail = async (to, name, token) => {
     const result = await resend.emails.send({
       from: "contacto_incide@resend.dev", // Este es el email de prueba de Resend
       to: to,
-      subject: "Olvidaste tu contraseña - Incide",
+      subject: "Olvidaste tu contraseña en Incide",
       html: createEmailTemplate(`¡Hola, ${name}!`, content),
     });
 

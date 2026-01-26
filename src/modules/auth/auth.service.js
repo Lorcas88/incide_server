@@ -45,6 +45,15 @@ export const loginUser = async ({ email, password }) => {
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
+  const isVerified = user.email_verified_at ? true : false;
+  if (!isVerified) {
+    throw new AppError(
+      "Cuenta no verificada. Revisa tu correo.",
+      "EMAIL_NOT_VERIFIED",
+      403,
+    );
+  }
+
   const accessToken = jwt.sign(
     { sub: user.id, role_id: user.role_id },
     config.security.jwtSecret,

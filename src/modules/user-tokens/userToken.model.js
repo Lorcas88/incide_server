@@ -1,9 +1,9 @@
 import BaseModel from "../../core/base.model.js";
 
-class PasswordReset extends BaseModel {
-  static table = "password_reset_tokens";
+class UserToken extends BaseModel {
+  static table = "user_tokens";
 
-  static fillable = ["user_id", "token_hash", "expires_at"];
+  static fillable = ["user_id", "type", "token_hash", "expires_at"];
   //   static hidden = ["password", "role_id"];
 
   async findByTokenHash(tokenHash) {
@@ -29,4 +29,4 @@ class PasswordReset extends BaseModel {
   }
 }
 
-export default PasswordReset;
+export default UserToken;

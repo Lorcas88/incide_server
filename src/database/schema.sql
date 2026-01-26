@@ -5,7 +5,7 @@
 
 -- Drop existing tables if they exist (for development)
 -- Order: Drop tables with foreign keys first
-DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS user_tokens;
 DROP TABLE IF EXISTS refresh_tokens;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS users;
@@ -46,6 +46,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   role_id INT UNSIGNED NOT NULL DEFAULT 3,
+  email_verified_at TIMESTAMP NULL,
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
@@ -135,11 +136,12 @@ CREATE TABLE refresh_tokens (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 5. RESET PASSWORD TOKENS TABLE
+-- 5. USER TOKENS TABLE
 -- ============================================
-CREATE TABLE password_reset_tokens (
+CREATE TABLE user_tokens (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNSIGNED NOT NULL,
+  type VARCHAR(100) NOT NULL,
   token_hash VARCHAR(255) NOT NULL,
   expires_at TIMESTAMP NOT NULL,
   used_at DATETIME NULL,
