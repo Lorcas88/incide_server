@@ -176,16 +176,16 @@ INSERT INTO ticket_status (name) VALUES
 -- ============================================
 
 -- Sample Admin User (password: Admin123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id) VALUES
-('Admin', 'User', 'admin@incide.com', '$2b$10$WWTim3jEKgr8L/1ea7H41.5Us1GlJIKMqVjEI3zgQYdbtlP6fehBG', TRUE, 1);
+INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
+('Admin', 'User', 'admin@incide.com', '$2b$10$WWTim3jEKgr8L/1ea7H41.5Us1GlJIKMqVjEI3zgQYdbtlP6fehBG', TRUE, 1, NOW());
 
 -- Sample Support User (password: Support123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id) VALUES
-('Support', 'User', 'support@incide.com', '$2b$10$i2cAZpTn1BpjQ2zxDYOTUuNQHqCZXXLHUq2abKzzivmv9rBCk1pVi', TRUE, 2);
+INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
+('Support', 'User', 'support@incide.com', '$2b$10$i2cAZpTn1BpjQ2zxDYOTUuNQHqCZXXLHUq2abKzzivmv9rBCk1pVi', TRUE, 2, NOW());
 
 -- Sample Regular User (password: User123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id) VALUES
-('John', 'Doe', 'john@example.com', '$2b$10$6xo6NzUq6za0Ms/RcMBXW.2Is6T/FOHsyebEbBQ2ihmqKdjyKGGuq', TRUE, 3);
+INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
+('John', 'Doe', 'john@example.com', '$2b$10$6xo6NzUq6za0Ms/RcMBXW.2Is6T/FOHsyebEbBQ2ihmqKdjyKGGuq', TRUE, 3, NOW());
 
 -- ============================================
 -- NOTES

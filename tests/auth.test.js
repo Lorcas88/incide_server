@@ -16,17 +16,18 @@ describe("POST /api/v1/auth/login", () => {
   let token;
 
   beforeAll(async () => {
-    // Limpia la tabla antes de empezar
+    // Clean tables before starting
     await pool.query("TRUNCATE TABLE tickets");
     await pool.query("DELETE FROM users");
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
 
+    // Create user with verified email
     await pool.query(
-      `INSERT INTO users (first_name, last_name, email, password)
-       VALUES (?, ?, ?, ?)`,
-      [testUser.first_name, testUser.last_name, testUser.email, hashedPassword]
+      `INSERT INTO users (first_name, last_name, email, password, email_verified_at)
+       VALUES (?, ?, ?, ?, NOW())`,
+      [testUser.first_name, testUser.last_name, testUser.email, hashedPassword],
     );
 
     const res = await request(app).post("/api/v1/auth/login").send({
@@ -34,11 +35,11 @@ describe("POST /api/v1/auth/login", () => {
       password: testUser.password,
     });
 
-    token = res.body.token;
+    token = res.body.data.token;
   });
 
   afterAll(async () => {
-    // Limpia y cierra conexiones
+    // Clean and close connections
     await pool.query("TRUNCATE TABLE tickets");
     await pool.query("DELETE FROM users");
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
@@ -52,7 +53,7 @@ describe("POST /api/v1/auth/login", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("token");
+    expect(res.body.data).toHaveProperty("token");
   });
 
   it("should return 401 for not existing user", async () => {

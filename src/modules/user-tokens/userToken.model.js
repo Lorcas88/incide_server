@@ -4,7 +4,7 @@ class UserToken extends BaseModel {
   static table = "user_tokens";
 
   static fillable = ["user_id", "type", "token_hash", "expires_at"];
-  //   static hidden = ["password", "role_id"];
+  static hidden = [];
 
   async findByTokenHash(tokenHash) {
     const [rows] = await this.pool.query(

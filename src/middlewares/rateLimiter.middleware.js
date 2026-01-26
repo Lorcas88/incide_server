@@ -1,6 +1,13 @@
 import rateLimit from "express-rate-limit";
 
-export const loginLimiter = rateLimit({
+// Bypass rate limiting in test environment
+const isTesting = process.env.NODE_ENV === "test";
+
+const createLimiter = (options) => {
+  return isTesting ? (req, res, next) => next() : rateLimit(options);
+};
+
+export const loginLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
   message: {
@@ -11,7 +18,7 @@ export const loginLimiter = rateLimit({
   },
 });
 
-export const resetPasswordLimiter = rateLimit({
+export const resetPasswordLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 3,
   message: {
@@ -22,7 +29,7 @@ export const resetPasswordLimiter = rateLimit({
   },
 });
 
-export const refreshLimiter = rateLimit({
+export const refreshLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
   message: {

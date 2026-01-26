@@ -7,4 +7,7 @@ export default {
   testMatch: ["**/tests/**/*.test.js"],
   setupFiles: ["<rootDir>/tests/setupEnv.js"],
   transform: {}, // Disable transformation for ESM support
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
 };

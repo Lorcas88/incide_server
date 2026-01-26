@@ -4,7 +4,7 @@ import logger from "../utils/logger.js";
 
 const resend = new Resend(config.emailSender.resend);
 
-// Template base para emails
+// Base email template
 const createEmailTemplate = (title, content) => {
   return `
     <div style="background-color: #f9fafb; font-family: 'Inter', system-ui, sans-serif; padding: 40px 20px; color: #4b5563; line-height: 1.6;">
@@ -67,7 +67,7 @@ export const sendConfirmationEmail = async (to, name, token) => {
 
     return result;
   } catch (error) {
-    logger.error("Error sending forgot password email:", {
+    logger.error("Error sending confirmation email:", {
       message: error.message,
       stack: error.stack,
     });
@@ -103,7 +103,7 @@ export const sendForgotEmail = async (to, name, token) => {
     `;
 
     const result = await resend.emails.send({
-      from: "contacto_incide@resend.dev", // Este es el email de prueba de Resend
+      from: "contacto_incide@resend.dev", // testing email of Resend
       to: to,
       subject: "Olvidaste tu contraseña en Incide",
       html: createEmailTemplate(`¡Hola, ${name}!`, content),
@@ -115,6 +115,99 @@ export const sendForgotEmail = async (to, name, token) => {
       message: error.message,
       stack: error.stack,
     });
-    throw error;
+    // Don't throw - email failure shouldn't break password reset flow
+  }
+};
+
+export const sendTicketAssignedEmail = async (
+  to,
+  name,
+  ticketId,
+  ticketTitle,
+) => {
+  try {
+    if (!to) {
+      throw new Error("Faltan campos para el correo");
+    }
+
+    const content = `
+      <div style="text-align: center;">
+        <h3 style="color: #0f172a; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 16px;">
+          Te han asignado un nuevo ticket
+        </h3>
+        <p style="margin-bottom: 32px; color: #4b5563;">
+          Se te ha asignado el ticket <b>#${ticketId}</b>: "${ticketTitle}".
+          Por favor revisa los detalles y comienza a trabajar en él.
+        </p>
+        <a href="${config.client.url}/tickets/${ticketId}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          Ver ticket
+        </a>
+      </div>
+    `;
+
+    const result = await resend.emails.send({
+      from: "contacto_incide@resend.dev",
+      to: to,
+      subject: `Ticket #${ticketId} asignado - Incide`,
+      html: createEmailTemplate(`¡Hola, ${name}!`, content),
+    });
+
+    return result;
+  } catch (error) {
+    logger.error("Error sending ticket assigned email:", {
+      message: error.message,
+      stack: error.stack,
+    });
+    // Don't throw - email failure shouldn't break the assignment
+  }
+};
+
+export const sendTicketStatusChangedEmail = async (
+  to,
+  name,
+  ticketId,
+  ticketTitle,
+  newStatus,
+) => {
+  try {
+    if (!to) {
+      throw new Error("Faltan campos para el correo");
+    }
+
+    const statusNames = {
+      1: "Abierto",
+      2: "En progreso",
+      3: "Cerrado",
+    };
+
+    const content = `
+      <div style="text-align: center;">
+        <h3 style="color: #0f172a; font-size: 20px; font-weight: 600; margin-top: 0; margin-bottom: 16px;">
+          Estado de tu ticket actualizado
+        </h3>
+        <p style="margin-bottom: 32px; color: #4b5563;">
+          El estado del ticket <b>#${ticketId}</b>: "${ticketTitle}" 
+          ha cambiado a <b>${statusNames[newStatus] || "Desconocido"}</b>.
+        </p>
+        <a href="${config.client.url}/tickets/${ticketId}" style="display: inline-block; background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          Ver ticket
+        </a>
+      </div>
+    `;
+
+    const result = await resend.emails.send({
+      from: "contacto_incide@resend.dev",
+      to: to,
+      subject: `Ticket #${ticketId} actualizado - Incide`,
+      html: createEmailTemplate(`¡Hola, ${name}!`, content),
+    });
+
+    return result;
+  } catch (error) {
+    logger.error("Error sending ticket status changed email:", {
+      message: error.message,
+      stack: error.stack,
+    });
+    // Don't throw - email failure shouldn't break the status change
   }
 };

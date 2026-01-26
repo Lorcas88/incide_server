@@ -1,5 +1,4 @@
 import swaggerJsdoc from "swagger-jsdoc";
-// import {} from "../modules/auth"
 
 const options = {
   definition: {

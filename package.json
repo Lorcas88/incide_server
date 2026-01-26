@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node --watch --env-file=.env ./src/server.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
-    "migrate": "node --env-file=.env src/database/migrations.js"
+    "migrate": "node --env-file=.env src/database/migrations.js",
+    "migrate:test": "node --env-file=.env.test src/database/migrations.js"
   },
   "keywords": [],
   "author": "",

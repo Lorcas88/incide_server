@@ -26,7 +26,9 @@ A production-ready RESTful API for ticket/incident management built with Node.js
   - JWT access tokens (1h expiration)
   - Refresh token rotation (7 days expiration)
   - HttpOnly cookies for secure token storage
-  - Role-based access control (User, Admin)
+  - Email verification for new accounts
+  - Password reset via email
+  - Role-based access control (User, Support, Admin)
 
 - **Ticket Management**
   - Create, read, update, delete tickets
@@ -204,6 +206,7 @@ http://localhost:3000/api-docs
 
 - `POST /api/v1/auth/register` - Register new user
 - `POST /api/v1/auth/login` - Login and get tokens
+- `POST /api/v1/auth/confirm` - Confirm email address with token
 - `POST /api/v1/auth/refresh` - Refresh access token
 - `POST /api/v1/auth/forgot-password` - Request password reset email
 - `POST /api/v1/auth/reset-password` - Reset password with token
@@ -330,23 +333,63 @@ The system supports revoking refresh tokens in these scenarios:
 
 ## Testing
 
+The project includes comprehensive test coverage across all modules with **82 tests** and **79.57% code coverage**.
+
+### Test Suites
+
+- **Authentication & Authorization** (5 tests) - Login, register, profile, account deletion
+- **Ticket Management** (18 tests) - CRUD, assignments, status changes, access control
+- **User Management** (11 tests) - Admin-only CRUD operations
+- **Refresh Tokens** (9 tests) - Token rotation, revocation, expiration
+- **Business Policies** (13 tests) - Role-based permissions, ticket visibility
+- **Workflow Validation** (15 tests) - Status transitions, invalid state prevention
+- **Application** (11 tests) - Health checks, error handling
+
+### Running Tests
+
 ```bash
 # Run all tests
 npm test
 
-# Run tests with coverage
-npm test -- --coverage
-
 # Run specific test file
 npm test -- auth.test.js
+npm test -- tickets.test.js
+npm test -- users.test.js
+
+# Run with coverage report
+npm test -- --coverage
 ```
 
-Current test coverage:
+### Test Database Setup
 
-- Authentication endpoints
-- Ticket CRUD operations
-- Authorization middleware
-- Business rules validation (TODO)
+Tests use a separate test database to avoid affecting development data:
+
+```bash
+# Create test database
+mysql -u root -p -e "CREATE DATABASE incide_db_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# Run migrations on test database
+npm run migrate:test
+```
+
+Test environment is configured in `.env.test` with `NODE_ENV=test` to:
+
+- Disable rate limiting for unlimited test requests
+- Use isolated test database
+- Mock email sending to prevent actual emails
+- Enable minimal logging for cleaner test output
+
+### Code Coverage
+
+```
+File                        | % Stmts | % Branch | % Funcs | % Lines |
+----------------------------|---------|----------|---------|---------|
+All files                   |   79.57 |    59.37 |   78.74 |      80 |
+ src/modules/auth           |    84.9 |    65.38 |   76.19 |    84.9 |
+ src/modules/tickets        |   80.89 |    72.22 |   75.67 |   80.57 |
+ src/modules/users          |   83.54 |       55 |   78.94 |   83.54 |
+ src/modules/refresh-tokens |   94.87 |       80 |    87.5 |   97.36 |
+```
 
 ## Project Structure
 

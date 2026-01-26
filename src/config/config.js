@@ -31,18 +31,18 @@ export const config = {
     // bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS),
   },
   cors: {
-    origin: "http://localhost:5173", // tu frontend
+    origin: "http://localhost:5173", // your frontend
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
   rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutos
+    windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100,
   },
   cookies: {
     httpOnly: true,
-    secure: true, // obligatorio en HTTPS
-    sameSite: "lax", // o "none" si es cross-site
+    secure: true, // required in HTTPS
+    sameSite: "lax", // or "none" if cross-site
     maxAge: 1000 * 60 * 60 * 24 * 7, // Must match refresh token TTL in the database
   },
   emailSender: {

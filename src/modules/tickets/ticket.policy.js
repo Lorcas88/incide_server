@@ -35,15 +35,13 @@ export const TicketPolicy = {
   },
 
   canBeAssignedTo(user) {
-    // if the role_id of the user that will be assigned, has the support role
-    return user.role_id === ROLES.SUPPORT;
+    // Support and Admin can be assigned to tickets
+    return user.role_id === ROLES.SUPPORT || user.role_id === ROLES.ADMIN;
   },
 
   canAssign(actor) {
-    // only admin can assign
-    if (actor.role_id === ROLES.ADMIN) return true;
-
-    return false;
+    // Admin and Support can assign tickets
+    return actor.role_id === ROLES.ADMIN || actor.role_id === ROLES.SUPPORT;
   },
 
   canSelfAssign(actor, ticket) {

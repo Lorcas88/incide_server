@@ -1,8 +1,13 @@
 import Ticket from "./ticket.model.js";
 import User from "../users/user.model.js";
 import { TicketPolicy } from "./ticket.policy.js";
-import { TicketWorkflow } from "../ticket_status/ticketStatus.workflow.js";
+import { TicketWorkflow } from "../ticket-status/ticketStatus.workflow.js";
 import AppError from "../../utils/AppError.js";
+import logger from "../../utils/logger.js";
+import {
+  sendTicketAssignedEmail,
+  sendTicketStatusChangedEmail,
+} from "../../core/mailer.js";
 
 const ticketModel = new Ticket();
 
@@ -106,7 +111,21 @@ export const assignTicketToUser = async (id, targetUserId, user) => {
     throw new AppError("Usuario inválido para asignación", "BAD_REQUEST", 400);
   }
 
-  return ticketModel.update(id, { assigned_to: targetUserId });
+  const updatedTicket = await ticketModel.update(id, {
+    assigned_to: targetUserId,
+  });
+
+  // Send notification to assigned user
+  if (targetUser.email) {
+    await sendTicketAssignedEmail(
+      targetUser.email,
+      targetUser.first_name,
+      ticket.id,
+      ticket.title,
+    );
+  }
+
+  return updatedTicket;
 };
 
 export const changeStatusTicket = async (id, data, user) => {
@@ -133,9 +152,32 @@ export const changeStatusTicket = async (id, data, user) => {
     );
   }
 
-  return await ticketModel.update(id, {
+  // Log status change for audit trail
+  logger.info("Ticket status changed", {
+    ticketId: id,
+    oldStatus: ticket.ticket_status_id,
+    newStatus: data.ticket_status_id,
+    changedBy: user.id,
+  });
+
+  const updatedTicket = await ticketModel.update(id, {
     ticket_status_id: data.ticket_status_id,
   });
+
+  // Send notification to ticket creator
+  const userModel = new User();
+  const creator = await userModel.find(ticket.created_by);
+  if (creator && creator.email) {
+    await sendTicketStatusChangedEmail(
+      creator.email,
+      creator.first_name,
+      ticket.id,
+      ticket.title,
+      data.ticket_status_id,
+    );
+  }
+
+  return updatedTicket;
 };
 
 export const deleteTicket = async (id, user) => {

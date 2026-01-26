@@ -4,7 +4,7 @@ class RefreshToken extends BaseModel {
   static table = "refresh_tokens";
 
   static fillable = ["user_id", "token_hash", "expires_at"];
-  //   static hidden = ["password", "role_id"];
+  static hidden = [];
 
   async findByTokenHash(tokenHash) {
     const [rows] = await this.pool.query(

@@ -1,20 +1,8 @@
-import { body, param, validationResult } from "express-validator";
+import { body, param } from "express-validator";
+import { validateResult } from "../../middlewares/validation.middleware.js";
+import TicketStatus from "../ticket-status/ticketStatus.model.js";
 
-// Middleware para manejar errores de validación
-export const validateResult = (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
-    });
-  }
-
-  next();
-};
+const ticketStatusModel = new TicketStatus();
 
 export const assignValidation = [
   body("assigned_to")
@@ -31,7 +19,14 @@ export const changeStatusValidation = [
     .notEmpty()
     .withMessage("El ticket_status_id es requerido")
     .isInt()
-    .withMessage("El ticket_status_id debe ser un número entero"),
+    .withMessage("El ticket_status_id debe ser un número entero")
+    .custom(async (value) => {
+      const status = await ticketStatusModel.find(value);
+      if (!status) {
+        throw new Error("El estado del ticket no es válido");
+      }
+      return true;
+    }),
 
   validateResult,
 ];

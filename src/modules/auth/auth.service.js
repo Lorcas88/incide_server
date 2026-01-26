@@ -86,7 +86,6 @@ export const changePasswordUser = async (
   });
 };
 
-// Para otra version se adaptará la lógica de baja de usuario
 export const deleteUser = async (id) => {
   const exist = await userModel.find(id);
   if (!exist) {

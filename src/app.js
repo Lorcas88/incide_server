@@ -15,10 +15,10 @@ import userRoutes from "./modules/users/user.routes.js";
 
 const app = express();
 
-// Seguridad HTTP
+// HTTP Security
 app.use(helmet());
 
-// Habilitar CORS
+// Enable CORS
 app.use(cors(config.cors));
 
 // Cookie Parsing
@@ -27,7 +27,7 @@ app.use(cookieParser());
 // JSON Parsing
 app.use(express.json());
 
-// Rate limit global Aplicar rate limit a todas las rutas
+// Global rate limit - Apply rate limit to all routes
 app.use(
   rateLimit({
     windowMs: config.rateLimit.windowMs,
@@ -79,7 +79,7 @@ app.use(
   }),
 );
 
-// Documentación Swagger
+// Swagger Documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Health Check
@@ -87,7 +87,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", uptime: process.uptime() });
 });
 
-// Rutas API
+// API Routes
 const API_PREFIX = "/api/v1";
 
 app.use(`${API_PREFIX}/auth`, authRoutes);

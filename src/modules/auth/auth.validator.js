@@ -1,22 +1,7 @@
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
+import { validateResult } from "../../middlewares/validation.middleware.js";
 
-// Middleware para manejar errores de validación
-export const validateResult = (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
-    });
-  }
-
-  next();
-};
-
-// Reglas de validación para el registro de usuarios
+// Validation rules for user registration
 export const registerValidation = [
   body("first_name")
     .trim()
@@ -65,7 +50,7 @@ export const registerValidation = [
   validateResult,
 ];
 
-// Reglas de validación para el login de usuarios
+// Validation rules for user login
 export const loginValidation = [
   body("email")
     .trim()
@@ -83,7 +68,7 @@ export const loginValidation = [
   validateResult,
 ];
 
-// Rules of validation to change password
+// Validation rules for password change
 export const changePasswordValidation = [
   body("old_password")
     .notEmpty()
@@ -112,7 +97,7 @@ export const changePasswordValidation = [
   validateResult,
 ];
 
-// Valdiation rule to reset password
+// Validation rules for forgot password
 export const forgotPasswordValidation = [
   body("email")
     .trim()
@@ -128,7 +113,7 @@ export const forgotPasswordValidation = [
   validateResult,
 ];
 
-// Rules of validation to change password
+// Validation rules for password reset
 export const resetPasswordValidation = [
   body("token").notEmpty().withMessage("El token es requerido"),
 

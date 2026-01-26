@@ -1,22 +1,7 @@
-import { body, param, validationResult } from "express-validator";
+import { body, param } from "express-validator";
+import { validateResult } from "../../middlewares/validation.middleware.js";
 
-// Middleware para manejar errores de validación
-export const validateResult = (req, res, next) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      errors: errors.array().map((err) => ({
-        field: err.path,
-        message: err.msg,
-      })),
-    });
-  }
-
-  next();
-};
-
-// Reglas de validación para el registro de usuarios
+// Validation rules for user registration
 export const idValidation = [
   param("id").isInt().withMessage("El ID debe ser un número entero"),
 
