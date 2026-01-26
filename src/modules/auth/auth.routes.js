@@ -37,7 +37,12 @@ router.post("/login", loginLimiter, loginValidation, login);
 router.post("/refresh", refreshLimiter, refresh);
 
 // Forgot password
-router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
+router.post(
+  "/forgot-password",
+  resetPasswordLimiter,
+  forgotPasswordValidation,
+  forgotPassword,
+);
 
 // Reset password
 router.post(
