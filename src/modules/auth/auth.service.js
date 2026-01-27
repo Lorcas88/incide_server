@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../users/user.model.js";
 import { config } from "../../config/config.js";
 import AppError from "../../utils/AppError.js";
+// import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
 
 const userModel = new User();
 
@@ -30,7 +31,7 @@ export const registerUser = async ({
     first_name,
     last_name,
     email: email.toLowerCase().trim(),
-    password: await bcrypt.hash(password, 10),
+    password: await bcrypt.hash(password, config.security.bcryptRounds),
   });
 };
 
@@ -45,8 +46,7 @@ export const loginUser = async ({ email, password }) => {
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
-  const isVerified = user.email_verified_at ? true : false;
-  if (!isVerified) {
+  if (!user.email_verified_at) {
     throw new AppError(
       "Cuenta no verificada. Revisa tu correo.",
       "EMAIL_NOT_VERIFIED",
@@ -63,7 +63,7 @@ export const loginUser = async ({ email, password }) => {
   return { accessToken, user_id: user.id };
 };
 
-export const changePasswordUser = async (
+export const changeUserPassword = async (
   id,
   { old_password, new_password },
 ) => {
@@ -82,7 +82,7 @@ export const changePasswordUser = async (
   }
 
   return await userModel.update(id, {
-    password: await bcrypt.hash(new_password, 10),
+    password: await bcrypt.hash(new_password, config.security.bcryptRounds),
   });
 };
 

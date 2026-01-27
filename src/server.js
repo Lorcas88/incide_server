@@ -7,8 +7,11 @@ const port = config.server.port;
 // Cleanup expired refresh tokens every 24 hours
 setInterval(
   async () => {
-    const model = new RefreshToken();
-    await model.deleteExpired();
+    try {
+      await model.deleteExpired();
+    } catch (e) {
+      console.error("Token cleanup failed", e);
+    }
   },
   24 * 60 * 60 * 1000,
 );

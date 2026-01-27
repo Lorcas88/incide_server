@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import User from "./user.model.js";
-import Role from "../roles/role.model.js";
+// import Role from "../roles/role.model.js";
 import AppError from "../../utils/AppError.js";
+import { config } from "../../config/config.js";
 
 const userModel = new User();
-const roleModel = new Role();
+// const roleModel = new Role();
 
 export const getAllUsers = async () => {
   return userModel.all();
@@ -35,15 +36,28 @@ export const createUser = async ({
     first_name,
     last_name,
     email: email.toLowerCase().trim(),
-    password: await bcrypt.hash(password, 10),
+    password: await bcrypt.hash(password, config.security.bcryptRounds),
     role_id,
   });
 };
 
 export const updateUser = async (id, data) => {
+  const { email, password } = data;
+
   const user = await userModel.find(id);
   if (!user) {
     throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
+  }
+
+  if (email) {
+    const existing = await userModel.findByEmail(email);
+    if (existing && existing.id !== id) {
+      throw new AppError("Usuario ya existe", "DUPLICATE_ENTRY", 409);
+    }
+  }
+
+  if (password) {
+    data.password = await bcrypt.hash(password, config.security.bcryptRounds);
   }
 
   return await userModel.update(id, data);

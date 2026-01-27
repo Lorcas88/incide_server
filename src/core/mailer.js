@@ -32,7 +32,7 @@ const createEmailTemplate = (title, content) => {
 
 export const sendConfirmationEmail = async (to, name, token) => {
   try {
-    const resetUrl = `${config.client.url}/confirm?token=${token}`;
+    const resetUrl = `${config.client.url}/confirm-email?token=${token}`;
 
     // Validate email recipient
     if (!to) {

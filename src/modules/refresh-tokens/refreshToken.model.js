@@ -3,8 +3,13 @@ import BaseModel from "../../core/base.model.js";
 class RefreshToken extends BaseModel {
   static table = "refresh_tokens";
 
-  static fillable = ["user_id", "token_hash", "expires_at"];
-  static hidden = [];
+  static fillable = [
+    "user_id",
+    "token_hash",
+    "expires_at",
+    "ip_address",
+    "user_agent",
+  ];
 
   async findByTokenHash(tokenHash) {
     const [rows] = await this.pool.query(
@@ -13,6 +18,13 @@ class RefreshToken extends BaseModel {
       [tokenHash],
     );
     return rows[0];
+  }
+
+  async markAsUsed(id) {
+    return this.pool.query(
+      `UPDATE ${this.table} SET used_at = NOW() WHERE id = ? AND used_at IS NULL`,
+      [id],
+    );
   }
 
   async revoke(id) {

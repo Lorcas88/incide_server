@@ -43,17 +43,24 @@ class User extends BaseModel {
     return rows[0] || null;
   }
 
-  async isUserVerified(email) {
-    const sql = `
-      SELECT *
-      FROM ${this.table}
-      WHERE email = ? AND email_verified_at IS NOT NULL
-    `;
-    const [rows] = await this.pool.query(sql, [email]);
-    return rows[0] || null;
-  }
+  // async isUserVerified(email) {
+  //   const sql = `
+  //     SELECT *
+  //     FROM ${this.table}
+  //     WHERE email = ? AND email_verified_at IS NOT NULL
+  //   `;
+  //   const [rows] = await this.pool.query(sql, [email]);
+  //   return rows[0] || null;
+  // }
 
-  async changeVerifiedStatus(id) {
+  // async changeVerifiedStatus(id) {
+  //   return this.pool.query(
+  //     `UPDATE ${this.table} SET email_verified_at = NOW() WHERE id = ?`,
+  //     [id],
+  //   );
+  // }
+
+  async verifyEmail(id) {
     return this.pool.query(
       `UPDATE ${this.table} SET email_verified_at = NOW() WHERE id = ?`,
       [id],

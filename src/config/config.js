@@ -28,7 +28,7 @@ export const config = {
     //   authWindowMs: 5 * 60 * 1000, // 5 minutes for auth endpoints
     //   authMaxAttempts: 5,
     // },
-    // bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS),
+    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS),
   },
   cors: {
     origin: "http://localhost:5173", // your frontend

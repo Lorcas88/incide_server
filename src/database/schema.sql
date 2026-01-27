@@ -118,7 +118,10 @@ CREATE TABLE refresh_tokens (
   token_hash VARCHAR(64) NOT NULL,
   expires_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  used_at TIMESTAMP NULL,
   revoked_at TIMESTAMP NULL,
+  ip_address VARCHAR(45) NULL COMMENT 'Client IP address (supports IPv4 and IPv6)',
+  user_agent VARCHAR(255) NULL COMMENT 'Client User-Agent string',
 
   -- Primary Keys & Unique
   CONSTRAINT pk_refresh_token PRIMARY KEY (id),
@@ -130,8 +133,8 @@ CREATE TABLE refresh_tokens (
     ON UPDATE CASCADE,
   
   -- Indexes
-  INDEX idx_refresh_tokens_hash (token_hash),
   INDEX idx_refresh_tokens_user (user_id),
+  INDEX idx_refresh_tokens_hash (token_hash),
   INDEX idx_refresh_tokens_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

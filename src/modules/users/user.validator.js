@@ -1,5 +1,8 @@
 import { body, param } from "express-validator";
 import { validateResult } from "../../middlewares/validation.middleware.js";
+import Role from "../roles/role.model.js";
+
+const RoleModel = new Role();
 
 // Validation rules for user registration
 export const idValidation = [
@@ -35,6 +38,7 @@ export const storeValidation = [
     }),
 
   body("password")
+    .trim()
     .notEmpty()
     .withMessage("La contraseña es requerida")
     .isStrongPassword()
@@ -43,6 +47,7 @@ export const storeValidation = [
     ),
 
   body("password_confirmation")
+    .trim()
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {
@@ -57,8 +62,15 @@ export const storeValidation = [
     .trim()
     .notEmpty()
     .withMessage("El rol es requerido")
-    .isInt({ min: 1, max: 3 })
-    .withMessage("El rol debe ser un número entre el 1 y 3"),
+    .custom(async (value) => {
+      const role = await RoleModel.find(value);
+      if (!role) {
+        throw new Error("Rol no válido");
+      }
+      return true;
+    }),
+
+  validateResult,
 ];
 
 export const updateValidation = [
@@ -93,6 +105,7 @@ export const updateValidation = [
     }),
 
   body("password")
+    .trim()
     .optional()
     .notEmpty()
     .withMessage("La contraseña es requerida")
@@ -102,6 +115,7 @@ export const updateValidation = [
     ),
 
   body("password_confirmation")
+    .trim()
     .optional()
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
@@ -118,6 +132,13 @@ export const updateValidation = [
     .trim()
     .notEmpty()
     .withMessage("El rol es requerido")
-    .isInt({ min: 1, max: 3 })
-    .withMessage("El rol debe ser un número entre el 1 y 3"),
+    .custom(async (value) => {
+      const role = await RoleModel.find(value);
+      if (!role) {
+        throw new Error("Rol no válido");
+      }
+      return true;
+    }),
+
+  validateResult,
 ];

@@ -54,10 +54,7 @@ export const confirmationUser = async ({ token }) => {
   }
 
   // Update email_verified_at
-  await userModel.emailVerified(storedToken.user_id);
-
-  // Mark token as used
-  await userTokenModel.markAsUsed(storedToken.id);
+  await userModel.verifyEmail(storedToken.user_id);
 
   // Delete the token once it's used
   await userTokenModel.delete(storedToken.id);

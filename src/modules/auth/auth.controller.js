@@ -4,13 +4,13 @@ import { addDays, addMinutes, serialize } from "../../utils/utils.js";
 import {
   registerUser,
   loginUser,
-  deleteUser,
   getUserById,
-  changePasswordUser,
+  changeUserPassword,
+  deleteUser,
 } from "./auth.service.js";
 import {
-  refreshToken,
   saveToken,
+  refreshToken,
   revokeToken,
   revokeAllForUser,
 } from "../refresh-tokens/refreshToken.service.js";
@@ -20,6 +20,7 @@ import {
   confirmationUser,
 } from "../user-tokens/userToken.service.js";
 import { TYPES } from "../user-tokens/userToken.constants.js";
+import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
 
 const hidden = ["password", "role_id"];
 
@@ -34,7 +35,16 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const { accessToken, user_id: userId } = await loginUser(req.body);
 
-  const refreshTokenValue = await saveToken(userId, addDays(7));
+  // Extract IP and User-Agent for tracking
+  const ipAddress = getClientIp(req);
+  const userAgent = getUserAgent(req);
+
+  const refreshTokenValue = await saveToken(
+    userId,
+    addDays(7),
+    ipAddress,
+    userAgent,
+  );
 
   res
     .cookie("refresh_token", refreshTokenValue, {
@@ -46,26 +56,38 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const refresh = asyncHandler(async (req, res) => {
-  const token = await refreshToken(req.cookies.refresh_token, addDays(7));
+  const token = req.cookies.refresh_token;
+
+  // Extract IP and User-Agent for tracking
+  const ipAddress = getClientIp(req);
+  const userAgent = getUserAgent(req);
+
+  const { accessToken, refreshToken } = await refreshToken(
+    token,
+    addDays(7),
+    ipAddress,
+    userAgent,
+  );
 
   res
-    .cookie("refresh_token", token.refresh_token, {
+    .cookie("refresh_token", refreshToken, {
       ...config.cookies,
       path: "/api/v1/auth/refresh",
     })
-    .json({ data: { token: token.access_token } });
+    .json({ data: { token: accessToken } });
 });
 
 export const confirmation = asyncHandler(async (req, res) => {
   await confirmationUser(req.body);
 
   res.status(200).json({
-    message: "Usuario confirmado. Por favor inicia sesión.",
+    message: "Usuario confirmado",
   });
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {
-  await createToken(req.body, addMinutes(15), TYPES.PASSWORD);
+  const { email } = req.body;
+  await createToken({ email }, addMinutes(15), TYPES.PASSWORD);
   // Always return success to prevent email enumeration
   res.status(200).json({
     message: `Se han enviado instrucciones al correo.`,
@@ -76,12 +98,12 @@ export const resetPassword = asyncHandler(async (req, res) => {
   await resetPasswordUser(req.body);
 
   res.status(200).json({
-    message: "Contraseña actualizada correctamente. Por favor inicia sesión.",
+    message: "Contraseña restablecida exitosamente.",
   });
 });
 
 export const changePassword = asyncHandler(async (req, res) => {
-  const user = await changePasswordUser(req.user.id, req.body);
+  const user = await changeUserPassword(req.user.id, req.body);
 
   await revokeAllForUser(req.user.id);
 

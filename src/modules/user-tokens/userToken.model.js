@@ -22,11 +22,11 @@ class UserToken extends BaseModel {
     );
   }
 
-  async deleteExpired() {
-    return this.pool.query(
-      `DELETE FROM ${this.table} WHERE expires_at < NOW()`,
-    );
-  }
+  // async deleteExpired() {
+  //   return this.pool.query(
+  //     `DELETE FROM ${this.table} WHERE expires_at < NOW()`,
+  //   );
+  // }
 }
 
 export default UserToken;

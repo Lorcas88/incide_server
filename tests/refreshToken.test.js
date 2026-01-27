@@ -183,7 +183,7 @@ describe("Refresh Token Flow", () => {
 
       // Change password
       const changeRes = await request(app)
-        .post("/api/v1/auth/change-password")
+        .put("/api/v1/auth/change-password")
         .set("Authorization", `Bearer ${token}`)
         .send({
           old_password: testUser.password,

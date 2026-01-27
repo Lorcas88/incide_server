@@ -29,6 +29,7 @@ export const registerValidation = [
     }),
 
   body("password")
+    .trim()
     .notEmpty()
     .withMessage("La contraseña es requerida")
     .isStrongPassword()
@@ -37,6 +38,7 @@ export const registerValidation = [
     ),
 
   body("password_confirmation")
+    .trim()
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {
@@ -63,7 +65,14 @@ export const loginValidation = [
       gmail_remove_subaddress: false,
     }),
 
-  body("password").notEmpty().withMessage("La contraseña es requerida"),
+  body("password").trim().notEmpty().withMessage("La contraseña es requerida"),
+
+  validateResult,
+];
+
+// Validation rules for user confirmation
+export const confirmationValidation = [
+  body("token").trim().notEmpty().withMessage("El token es requerido"),
 
   validateResult,
 ];
@@ -71,6 +80,7 @@ export const loginValidation = [
 // Validation rules for password change
 export const changePasswordValidation = [
   body("old_password")
+    .trim()
     .notEmpty()
     .withMessage("La antigua contraseña es requerida"),
 
@@ -81,7 +91,13 @@ export const changePasswordValidation = [
     .isStrongPassword()
     .withMessage(
       "La nueva contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo",
-    ),
+    )
+    .custom((value, { req }) => {
+      if (value === req.body.old_password) {
+        throw new Error("La nueva contraseña debe ser distinta a la anterior");
+      }
+      return true;
+    }),
 
   body("password_confirmation")
     .notEmpty()
@@ -90,7 +106,6 @@ export const changePasswordValidation = [
       if (value !== req.body.new_password) {
         throw new Error("Las contraseñas no coinciden");
       }
-
       return true;
     }),
 
@@ -127,6 +142,7 @@ export const resetPasswordValidation = [
     ),
 
   body("password_confirmation")
+    .trim()
     .notEmpty()
     .withMessage("La confirmación de contraseña es requerida")
     .custom((value, { req }) => {

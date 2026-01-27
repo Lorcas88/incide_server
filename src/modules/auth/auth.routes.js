@@ -38,7 +38,7 @@ router.post("/login", loginLimiter, loginValidation, login);
 router.post("/refresh", refreshLimiter, refresh);
 
 // Confirmation account
-router.post("/confirm", confirmation);
+router.post("/confirm-email", confirmation);
 
 // Forgot password
 router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
@@ -52,7 +52,7 @@ router.post(
 );
 
 // Change password
-router.post(
+router.put(
   "/change-password",
   authMiddleware,
   changePasswordValidation,
@@ -68,7 +68,7 @@ router.delete("/unsubscribe", authMiddleware, destroy);
 // Logout
 router.post("/logout", authMiddleware, logout);
 
-// Logout
+// Logout of all devices
 router.post("/logout-all", authMiddleware, logoutAll);
 
 export default router;
