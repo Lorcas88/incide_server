@@ -111,11 +111,11 @@ describe("TicketPolicy", () => {
       expect(TicketPolicy.canAssign(admin, ticket)).toBe(true);
     });
 
-    it("should allow support to assign tickets", () => {
+    it("should deny support from assigning tickets", () => {
       const support = { id: 5, role_id: ROLES.SUPPORT };
       const ticket = { created_by: 1 };
 
-      expect(TicketPolicy.canAssign(support, ticket)).toBe(true);
+      expect(TicketPolicy.canAssign(support, ticket)).toBe(false);
     });
   });
 
