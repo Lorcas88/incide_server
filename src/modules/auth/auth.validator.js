@@ -5,6 +5,7 @@ import { validateResult } from "../../middlewares/validation.middleware.js";
 export const registerValidation = [
   body("first_name")
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El nombre es requerido")
     .isLength({ min: 3, max: 50 })
@@ -12,6 +13,7 @@ export const registerValidation = [
 
   body("last_name")
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El apellido es requerido")
     .isLength({ min: 3, max: 50 })

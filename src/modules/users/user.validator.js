@@ -14,6 +14,7 @@ export const idValidation = [
 export const storeValidation = [
   body("first_name")
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El nombre es requerido")
     .isLength({ min: 3, max: 50 })
@@ -21,6 +22,7 @@ export const storeValidation = [
 
   body("last_name")
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El apellido es requerido")
     .isLength({ min: 3, max: 50 })
@@ -79,6 +81,7 @@ export const updateValidation = [
   body("first_name")
     .optional()
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El nombre es requerido")
     .isLength({ min: 3, max: 50 })
@@ -87,6 +90,7 @@ export const updateValidation = [
   body("last_name")
     .optional()
     .trim()
+    .escape()
     .notEmpty()
     .withMessage("El apellido es requerido")
     .isLength({ min: 3, max: 50 })
