@@ -1,5 +1,5 @@
-import { TicketWorkflow } from "../src/modules/ticket-status/ticketStatus.workflow.js";
-import { TICKET_STATUS } from "../src/modules/ticket-status/ticketStatus.constants.js";
+import { TicketWorkflow } from "../../../src/modules/ticket-status/ticketStatus.workflow.js";
+import { TICKET_STATUS } from "../../../src/modules/ticket-status/ticketStatus.constants.js";
 
 describe("TicketWorkflow", () => {
   describe("canTransition", () => {

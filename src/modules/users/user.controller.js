@@ -6,9 +6,10 @@ import {
   getUserById,
   updateUser,
   deleteUser,
+  restoreUser,
 } from "./user.service.js";
 
-const hidden = ["password", "role_id"];
+const hidden = ["password", "role_id", "email_active"];
 
 export const index = asyncHandler(async (req, res) => {
   const users = await getAllUsers();
@@ -44,4 +45,15 @@ export const destroy = asyncHandler(async (req, res) => {
   await deleteUser(id);
 
   res.status(204).json();
+});
+
+export const restore = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const user = await restoreUser(id);
+
+  res.status(200).json({
+    data: serialize(user, hidden),
+    message: "Usuario restaurado exitosamente",
+  });
 });

@@ -106,10 +106,11 @@
  *       404:
  *         description: Ticket not found
  *   delete:
- *     summary: Delete a ticket
+ *     summary: Soft delete a ticket (Admin only)
  *     tags: [Tickets]
  *     security:
  *       - bearerAuth: []
+ *     description: Admin only - Soft deletes a ticket by setting deleted_at timestamp. Deleted tickets can be restored.
  *     parameters:
  *       - in: path
  *         name: id
@@ -119,9 +120,36 @@
  *           example: 1
  *     responses:
  *       204:
- *         description: Ticket deleted successfully
+ *         description: Ticket soft deleted successfully
+ *       403:
+ *         description: Forbidden (Admin role required)
  *       404:
  *         description: Ticket not found
+ */
+
+/**
+ * @swagger
+ * /tickets/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted ticket (Admin only)
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Admin only - Restores a previously deleted ticket by clearing the deleted_at timestamp
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Ticket restored successfully
+ *       403:
+ *         description: Forbidden (Admin role required)
+ *       404:
+ *         description: Ticket not found or not deleted
  */
 
 /**

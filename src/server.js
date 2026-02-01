@@ -8,6 +8,7 @@ const port = config.server.port;
 setInterval(
   async () => {
     try {
+      const model = new RefreshToken();
       await model.deleteExpired();
     } catch (e) {
       console.error("Token cleanup failed", e);

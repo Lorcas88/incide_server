@@ -11,7 +11,8 @@ import {
   getAllTicketsByUser,
   selfAssignTicket,
   assignTicketToUser,
-  changeStatusTicket,
+  changeTicketStatus,
+  restoreTicket,
 } from "./ticket.service.js";
 
 const hidden = [];
@@ -80,7 +81,7 @@ export const assignToUser = asyncHandler(async (req, res) => {
 export const changeStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const ticket = await changeStatusTicket(id, req.body, req.user);
+  const ticket = await changeTicketStatus(id, req.body, req.user);
 
   res.status(200).json({ data: serialize(ticket, hidden) });
 });
@@ -91,4 +92,12 @@ export const destroy = asyncHandler(async (req, res) => {
   await deleteTicket(id, req.user);
 
   res.status(204).json();
+});
+
+export const restore = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const ticket = await restoreTicket(id, req.user);
+
+  res.status(200).json({ data: serialize(ticket, hidden) });
 });

@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { destroy, index, show, store, update } from "./user.controller.js";
+import {
+  destroy,
+  index,
+  show,
+  store,
+  update,
+  restore,
+} from "./user.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import {
   idValidation,
@@ -42,6 +49,15 @@ router.delete(
   authorize(ROLES.ADMIN),
   idValidation,
   destroy,
+);
+
+// Restore a soft-deleted user
+router.patch(
+  "/:id/restore",
+  authMiddleware,
+  authorize(ROLES.ADMIN),
+  idValidation,
+  restore,
 );
 
 export default router;

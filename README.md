@@ -32,8 +32,10 @@ A production-ready RESTful API for ticket/incident management built with Node.js
 
 - **Ticket Management**
   - Create, read, update, delete tickets
+  - **Soft delete** - Deleted tickets can be restored by admins
   - Status workflow validation (open → in_progress → closed)
   - Role-based visibility (users see own tickets, admins see all)
+  - Ticket assignment and self-assignment
 
 - **Security**
   - Helmet.js for HTTP headers security
@@ -221,7 +223,8 @@ http://localhost:3000/api-docs
 **Admin Only:**
 
 - `GET /api/v1/tickets` - List all tickets
-- `DELETE /api/v1/tickets/:id` - Delete ticket
+- `DELETE /api/v1/tickets/:id` - Soft delete ticket (sets `deleted_at`)
+- `PATCH /api/v1/tickets/:id/restore` - Restore deleted ticket
 - `PATCH /api/v1/tickets/:id/assign` - Assign ticket to support user
 
 **Support Only:**
@@ -253,7 +256,8 @@ http://localhost:3000/api-docs
 - `GET /api/v1/users/:id` - Get user details
 - `POST /api/v1/users` - Create user
 - `PUT /api/v1/users/:id` - Update user
-- `DELETE /api/v1/users/:id` - Delete user
+- `DELETE /api/v1/users/:id` - Soft delete user (sets `deleted_at`)
+- `PATCH /api/v1/users/:id/restore` - Restore deleted user
 
 ### Role-Based Permissions
 

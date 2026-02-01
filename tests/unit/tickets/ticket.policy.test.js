@@ -1,5 +1,5 @@
-import { TicketPolicy } from "../src/modules/tickets/ticket.policy.js";
-import { ROLES } from "../src/modules/roles/role.constants.js";
+import { TicketPolicy } from "../../../src/modules/tickets/ticket.policy.js";
+import { ROLES } from "../../../src/modules/roles/role.constants.js";
 
 describe("TicketPolicy", () => {
   describe("view", () => {

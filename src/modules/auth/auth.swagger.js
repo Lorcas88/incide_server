@@ -108,13 +108,14 @@
  * @swagger
  * /auth/unsubscribe:
  *   delete:
- *     summary: Unsubscribe (delete) current user
+ *     summary: Unsubscribe (soft delete) current user
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
+ *     description: Soft deletes the current user account by setting deleted_at timestamp. User will not be able to login after deletion.
  *     responses:
  *       204:
- *         description: User deleted successfully
+ *         description: User account soft deleted successfully
  *       401:
  *         description: Unauthorized
  */

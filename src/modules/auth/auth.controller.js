@@ -22,14 +22,28 @@ import {
 import { TYPES } from "../user-tokens/userToken.constants.js";
 import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
 
-const hidden = ["password", "role_id"];
+const hidden = ["password", "role_id", "email_active"];
 
 export const register = asyncHandler(async (req, res) => {
   const user = await registerUser(req.body);
 
-  await createToken(req.body, addMinutes(60), TYPES.EMAIL);
+  const verificationToken = await createToken(
+    req.body,
+    addMinutes(60),
+    TYPES.EMAIL,
+  );
 
-  res.status(201).json({ data: serialize(user, hidden) });
+  // In test environment, include the verification token in response
+  if (process.env.NODE_ENV === "test" && verificationToken) {
+    res.status(201).json({
+      data: {
+        ...serialize(user, hidden),
+        verification_token: verificationToken,
+      },
+    });
+  } else {
+    res.status(201).json({ data: serialize(user, hidden) });
+  }
 });
 
 export const login = asyncHandler(async (req, res) => {
@@ -62,7 +76,7 @@ export const refresh = asyncHandler(async (req, res) => {
   const ipAddress = getClientIp(req);
   const userAgent = getUserAgent(req);
 
-  const { accessToken, refreshToken } = await refreshToken(
+  const { access_token, refresh_token } = await refreshToken(
     token,
     addDays(7),
     ipAddress,
@@ -70,11 +84,11 @@ export const refresh = asyncHandler(async (req, res) => {
   );
 
   res
-    .cookie("refresh_token", refreshToken, {
+    .cookie("refresh_token", refresh_token, {
       ...config.cookies,
       path: "/api/v1/auth/refresh",
     })
-    .json({ data: { token: accessToken } });
+    .json({ data: { token: access_token } });
 });
 
 export const confirmation = asyncHandler(async (req, res) => {

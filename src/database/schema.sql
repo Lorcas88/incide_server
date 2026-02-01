@@ -43,6 +43,10 @@ CREATE TABLE users (
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(150) NOT NULL,
+  email_active VARCHAR(255)
+  GENERATED ALWAYS AS (
+    CASE WHEN deleted_at IS NULL THEN email ELSE NULL END
+  ) STORED,
   password VARCHAR(255) NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   role_id INT UNSIGNED NOT NULL DEFAULT 3,
@@ -50,10 +54,11 @@ CREATE TABLE users (
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
-  
+  deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
+ 
   -- Primary Keys & Unique
   CONSTRAINT pk_users PRIMARY KEY (id),
-  CONSTRAINT uq_users_email UNIQUE (email),
+  CONSTRAINT uq_users_email UNIQUE (email_active),
   CONSTRAINT chk_users_is_active CHECK (is_active IN (0, 1)),
   
   -- Foreign Keys
@@ -66,7 +71,8 @@ CREATE TABLE users (
   -- Indexes
   INDEX idx_users_email (email),
   INDEX idx_users_role (role_id),
-  INDEX idx_users_active (is_active)
+  INDEX idx_users_active (is_active),
+  INDEX idx_users_deleted_at (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -82,6 +88,7 @@ CREATE TABLE tickets (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
   
   -- Primary Keys & Unique
   CONSTRAINT pk_tickets PRIMARY KEY (id),
@@ -106,7 +113,8 @@ CREATE TABLE tickets (
   INDEX idx_tickets_status (ticket_status_id),
   INDEX idx_tickets_creator (created_by),
   INDEX idx_tickets_assignee (assigned_to),
-  INDEX idx_tickets_created_at (created_at)
+  INDEX idx_tickets_created_at (created_at),
+  INDEX idx_tickets_deleted_at (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -120,6 +128,7 @@ CREATE TABLE refresh_tokens (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   used_at TIMESTAMP NULL,
   revoked_at TIMESTAMP NULL,
+  deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
   ip_address VARCHAR(45) NULL COMMENT 'Client IP address (supports IPv4 and IPv6)',
   user_agent VARCHAR(255) NULL COMMENT 'Client User-Agent string',
 
@@ -135,11 +144,12 @@ CREATE TABLE refresh_tokens (
   -- Indexes
   INDEX idx_refresh_tokens_user (user_id),
   INDEX idx_refresh_tokens_hash (token_hash),
-  INDEX idx_refresh_tokens_expires (expires_at)
+  INDEX idx_refresh_tokens_expires (expires_at),
+  INDEX idx_refresh_tokens_deleted_at (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- 5. USER TOKENS TABLE
+-- 6. USER TOKENS TABLE (for email verification, password reset)
 -- ============================================
 CREATE TABLE user_tokens (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -149,12 +159,18 @@ CREATE TABLE user_tokens (
   expires_at TIMESTAMP NOT NULL,
   used_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
   
   -- Foreign Keys
   CONSTRAINT fk_password_resets_user
     FOREIGN KEY (user_id)
     REFERENCES users(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+    
+  -- Indexes
+  INDEX idx_user_tokens_hash (token_hash),
+  INDEX idx_user_tokens_user (user_id),
+  INDEX idx_user_tokens_deleted_at (deleted_at)
 );
 
 -- ============================================

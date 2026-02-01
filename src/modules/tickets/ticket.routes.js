@@ -11,6 +11,7 @@ import {
   selfAssign,
   assignToUser,
   changeStatus,
+  restore,
 } from "./ticket.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import {
@@ -92,6 +93,15 @@ router.patch(
   authorize(ROLES.ADMIN, ROLES.SUPPORT),
   changeStatusValidation,
   changeStatus,
+);
+
+// Restore a deleted ticket (admin only)
+router.patch(
+  "/:id/restore",
+  authMiddleware,
+  authorize(ROLES.ADMIN),
+  idValidation,
+  restore,
 );
 
 // Delete a tickets

@@ -128,7 +128,7 @@ export const assignTicketToUser = async (id, targetUserId, user) => {
   return updatedTicket;
 };
 
-export const changeStatusTicket = async (id, data, user) => {
+export const changeTicketStatus = async (id, data, user) => {
   const ticket = await ticketModel.find(id);
   if (!ticket) {
     throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
@@ -191,4 +191,26 @@ export const deleteTicket = async (id, user) => {
   }
 
   return await ticketModel.delete(id);
+};
+
+export const restoreTicket = async (id, user) => {
+  // Only admins can restore tickets
+  if (user.role_id !== 1) {
+    throw new AppError("Acceso prohibido", "FORBIDDEN", 403);
+  }
+
+  // Check if ticket exists (including deleted ones)
+  const sql = `SELECT * FROM tickets WHERE id = ?`;
+  const [rows] = await ticketModel.pool.query(sql, [id]);
+  const ticket = rows[0];
+
+  if (!ticket) {
+    throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
+  }
+
+  if (!ticket.deleted_at) {
+    throw new AppError("El ticket no está eliminado", "BAD_REQUEST", 400);
+  }
+
+  return await ticketModel.restore(id);
 };

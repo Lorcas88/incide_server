@@ -10,37 +10,18 @@ class User extends BaseModel {
     "password",
     "is_active",
     "role_id",
+    "email_verified_at",
+    "deleted_at",
   ];
 
-  async all() {
-    const sql = `
-      SELECT ${this.table}.*, roles.name as role
-      FROM ${this.table}
-      LEFT JOIN roles ON ${this.table}.role_id = roles.id
-    `;
-    const [rows] = await this.pool.query(sql);
-    return rows;
+  withRole() {
+    return this.select("roles.name AS role").leftJoin(
+      `LEFT JOIN roles ON ${this.table}.role_id = roles.id`,
+    );
   }
 
-  async find(id) {
-    const sql = `
-      SELECT ${this.table}.*, roles.name as role
-      FROM ${this.table}
-      LEFT JOIN roles ON ${this.table}.role_id = roles.id
-      WHERE ${this.table}.id = ?
-    `;
-    const [rows] = await this.pool.query(sql, [id]);
-    return rows[0] || null;
-  }
-
-  async findByEmail(email) {
-    const sql = `
-      SELECT *
-      FROM ${this.table}
-      WHERE email = ?
-    `;
-    const [rows] = await this.pool.query(sql, [email]);
-    return rows[0] || null;
+  findByEmail(email) {
+    return this.where("users.email = ?", [email]).first();
   }
 
   // async isUserVerified(email) {

@@ -3,7 +3,13 @@ import BaseModel from "../../core/base.model.js";
 class UserToken extends BaseModel {
   static table = "user_tokens";
 
-  static fillable = ["user_id", "type", "token_hash", "expires_at"];
+  static fillable = [
+    "user_id",
+    "type",
+    "token_hash",
+    "expires_at",
+    "deleted_at",
+  ];
   static hidden = [];
 
   async findByTokenHash(tokenHash) {

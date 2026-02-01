@@ -1,9 +1,9 @@
 import request from "supertest";
-import app from "../src/app.js";
+import app from "../../../src/app.js";
 import bcrypt from "bcrypt";
-import pool from "../src/config/db.js";
-import jwt from "jsonwebtoken";
-import { config } from "../src/config/config.js";
+import pool from "../../../src/config/db.js";
+// import jwt from "jsonwebtoken";
+// import { config } from "../src/config/config.js";
 
 describe("Refresh Token Flow", () => {
   const testUser = {
@@ -244,6 +244,89 @@ describe("Refresh Token Flow", () => {
       const res = await request(app).post("/api/v1/auth/refresh");
 
       expect(res.status).toBe(401);
+    });
+  });
+
+  describe("Concurrent Token Usage (Reuse Attack Detection)", () => {
+    it("should detect and revoke all tokens on concurrent usage attempt", async () => {
+      // Login to get a fresh token
+      const loginRes = await request(app).post("/api/v1/auth/login").send({
+        email: testUser.email,
+        password: testUser.password,
+      });
+
+      const cookie = loginRes.headers["set-cookie"].find((c) =>
+        c.startsWith("refresh_token="),
+      );
+      const token = loginRes.body.data.token;
+
+      // Simulate two concurrent refresh requests with the same token
+      // In a real attack, an attacker would try to use a stolen token
+      // while the legitimate user is also using it
+
+      const [firstRefresh, secondRefresh] = await Promise.all([
+        request(app).post("/api/v1/auth/refresh").set("Cookie", cookie),
+        request(app).post("/api/v1/auth/refresh").set("Cookie", cookie),
+      ]);
+
+      // One should succeed (the one that marks it as used first)
+      // The other should fail and trigger revocation
+      const responses = [firstRefresh, secondRefresh];
+      const successCount = responses.filter((r) => r.status === 200).length;
+      const failCount = responses.filter((r) => r.status === 401).length;
+
+      // Exactly one should succeed, one should fail
+      expect(successCount).toBe(1);
+      expect(failCount).toBe(1);
+
+      // The failed one should have REFRESH_TOKEN_REUSE error
+      const failedResponse = responses.find((r) => r.status === 401);
+      expect(failedResponse.body.error.code).toBe("REFRESH_TOKEN_REUSE");
+
+      // After reuse detection, ALL tokens for the user should be revoked
+      // Try to use the new token from the successful refresh
+      const successResponse = responses.find((r) => r.status === 200);
+      if (successResponse) {
+        const newCookie = successResponse.headers["set-cookie"]?.find((c) =>
+          c.startsWith("refresh_token="),
+        );
+
+        if (newCookie) {
+          const thirdRefresh = await request(app)
+            .post("/api/v1/auth/refresh")
+            .set("Cookie", newCookie);
+
+          // Should be revoked due to reuse detection
+          expect(thirdRefresh.status).toBe(401);
+        }
+      }
+    });
+
+    it("should revoke all tokens if IP address changes", async () => {
+      // Login with one IP
+      const loginRes = await request(app)
+        .post("/api/v1/auth/login")
+        .set("X-Forwarded-For", "192.168.1.100")
+        .send({
+          email: testUser.email,
+          password: testUser.password,
+        });
+
+      const cookie = loginRes.headers["set-cookie"].find((c) =>
+        c.startsWith("refresh_token="),
+      );
+
+      expect(loginRes.status).toBe(200);
+
+      // Try to refresh from different IP
+      const refreshRes = await request(app)
+        .post("/api/v1/auth/refresh")
+        .set("Cookie", cookie)
+        .set("X-Forwarded-For", "10.0.0.50"); // Different IP
+
+      // Should be rejected and all tokens revoked
+      expect(refreshRes.status).toBe(401);
+      expect(refreshRes.body.error.code).toBe("REFRESH_TOKEN_INVALID");
     });
   });
 });

@@ -103,10 +103,11 @@
  *       200:
  *         description: User updated successfully
  *   delete:
- *     summary: Delete a user
+ *     summary: Soft delete a user (Admin only)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
+ *     description: Admin only - Soft deletes a user by setting deleted_at timestamp. Deleted users cannot login.
  *     parameters:
  *       - in: path
  *         name: id
@@ -116,5 +117,32 @@
  *           example: 2
  *     responses:
  *       204:
- *         description: User deleted successfully
+ *         description: User soft deleted successfully
+ *       403:
+ *         description: Forbidden (Admin role required)
+ */
+
+/**
+ * @swagger
+ * /users/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted user (Admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     description: Admin only - Restores a previously deleted user by clearing the deleted_at timestamp
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 2
+ *     responses:
+ *       200:
+ *         description: User restored successfully
+ *       403:
+ *         description: Forbidden (Admin role required)
+ *       404:
+ *         description: User not found or not deleted
  */

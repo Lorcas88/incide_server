@@ -31,6 +31,16 @@ const createEmailTemplate = (title, content) => {
 };
 
 export const sendConfirmationEmail = async (to, name, token) => {
+  // Skip sending emails in test environment
+  if (process.env.NODE_ENV === "test") {
+    logger.info("Skipping email send in test environment", {
+      type: "confirmation",
+      to,
+      name,
+    });
+    return { id: "test-email-id" };
+  }
+
   try {
     const resetUrl = `${config.client.url}/confirm-email?token=${token}`;
 
@@ -76,6 +86,16 @@ export const sendConfirmationEmail = async (to, name, token) => {
 };
 
 export const sendForgotEmail = async (to, name, token) => {
+  // Skip sending emails in test environment
+  if (process.env.NODE_ENV === "test") {
+    logger.info("Skipping email send in test environment", {
+      type: "forgot-password",
+      to,
+      name,
+    });
+    return { id: "test-email-id" };
+  }
+
   try {
     const resetUrl = `${config.client.url}/reset-password?token=${token}`;
 
@@ -125,6 +145,17 @@ export const sendTicketAssignedEmail = async (
   ticketId,
   ticketTitle,
 ) => {
+  // Skip sending emails in test environment
+  if (process.env.NODE_ENV === "test") {
+    logger.info("Skipping email send in test environment", {
+      type: "ticket-assigned",
+      to,
+      name,
+      ticketId,
+    });
+    return { id: "test-email-id" };
+  }
+
   try {
     if (!to) {
       throw new Error("Faltan campos para el correo");
@@ -169,6 +200,18 @@ export const sendTicketStatusChangedEmail = async (
   ticketTitle,
   newStatus,
 ) => {
+  // Skip sending emails in test environment
+  if (process.env.NODE_ENV === "test") {
+    logger.info("Skipping email send in test environment", {
+      type: "ticket-status-changed",
+      to,
+      name,
+      ticketId,
+      newStatus,
+    });
+    return { id: "test-email-id" };
+  }
+
   try {
     if (!to) {
       throw new Error("Faltan campos para el correo");

@@ -54,6 +54,10 @@ export const loginUser = async ({ email, password }) => {
     );
   }
 
+  if (user.deleted_at) {
+    throw new AppError("Esta cuenta ha sido eliminada", "ACCOUNT_DELETED", 403);
+  }
+
   const accessToken = jwt.sign(
     { sub: user.id, role_id: user.role_id },
     config.security.jwtSecret,

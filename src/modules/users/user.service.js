@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
 import User from "./user.model.js";
-// import Role from "../roles/role.model.js";
 import AppError from "../../utils/AppError.js";
 import { config } from "../../config/config.js";
 
 const userModel = new User();
-// const roleModel = new Role();
 
 export const getAllUsers = async () => {
   return userModel.all();
@@ -70,4 +68,18 @@ export const deleteUser = async (id) => {
   }
 
   return await userModel.delete(id);
+};
+
+export const restoreUser = async (id) => {
+  // Use onlyDeleted scope to find soft-deleted users
+  const user = await userModel.onlyDeleted().find(id);
+  if (!user) {
+    throw new AppError(
+      "Usuario no encontrado o no está eliminado",
+      "NOT_FOUND",
+      404,
+    );
+  }
+
+  return await userModel.restore(id);
 };

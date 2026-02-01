@@ -2,35 +2,107 @@ import pool from "../config/db.js";
 
 class BaseModel {
   constructor() {
+    // table is written with the value of the instance
     this.table = this.constructor.table;
     this.pool = pool;
+
+    // Internal properties
+    this._select = [`${this.table}.*`];
+    this._joins = [];
+    this._wheres = [];
+    this._bindings = [];
+
+    // All queries exclude "deleted" records
+    this.where(`${this.table}.deleted_at IS NULL`);
   }
 
-  isFillable(data) {
-    const { fillable } = this.constructor;
-    if (!Array.isArray(fillable)) return data;
-
-    const filtered = {};
-    // Turn into an array, then iterates it to validate if a key of data
-    // is included in the fillable array to finally save it in the filtered object
-    Object.entries(data).forEach(([key, value]) => {
-      if (fillable.includes(key)) {
-        filtered[key] = value;
-      }
-    });
-    return filtered;
+  /* ---------------- QUERY BUILDER ---------------- */
+  // Select constructor
+  select(expr) {
+    this._select.push(expr);
+    return this;
   }
 
-  async all() {
-    const sql = `SELECT * FROM ${this.table}`;
-    const [rows] = await pool.query(sql);
+  // Left join constructor
+  leftJoin(sql) {
+    this._joins.push(sql);
+    return this;
+  }
+
+  // where constructor
+  where(sql, bindings = []) {
+    this._wheres.push(sql);
+    this._bindings.push(...bindings);
+    return this;
+  }
+
+  // filter the wheres array, removing the "deleted_at" instruction
+  withDeleted() {
+    this._wheres = this._wheres.filter((w) => !w.includes("deleted_at"));
+    return this;
+  }
+
+  // filter the wheres array, removing the "deleted_at" instruction
+  // and add the instruction deleted_at IS NOT NULL
+  onlyDeleted() {
+    this._wheres = this._wheres.filter((w) => !w.includes("deleted_at"));
+    this.where(`${this.table}.deleted_at IS NOT NULL`);
+    return this;
+  }
+
+  buildQuery() {
+    let sql = `
+      SELECT ${this._select.join(", ")}
+      FROM ${this.table}
+      ${this._joins.join(" ")}
+    `;
+
+    if (this._wheres.length) {
+      sql += " WHERE " + this._wheres.join(" AND ");
+    }
+
+    return sql;
+  }
+
+  reset() {
+    this._select = [`${this.table}.*`];
+    this._joins = [];
+    this._wheres = [];
+    this._bindings = [];
+
+    // Restore default deleted_at filter
+    this.where(`${this.table}.deleted_at IS NULL`);
+  }
+
+  async get() {
+    const sql = this.buildQuery();
+    const [rows] = await this.pool.query(sql, this._bindings);
+    this.reset();
     return rows;
   }
 
-  async find(id) {
-    const sql = `SELECT * FROM ${this.table} WHERE id = ?`;
-    const [rows] = await pool.query(sql, [id]);
+  async first() {
+    const rows = await this.get();
     return rows[0] || null;
+  }
+
+  /* ---------------- FILLABLE & FIND OR FAIL ---------------- */
+  isFillable(data) {
+    const fillable = this.constructor.fillable ?? [];
+    if (!fillable.length) return data;
+
+    return Object.fromEntries(
+      Object.entries(data).filter(([key]) => fillable.includes(key)),
+    );
+  }
+
+  /* ---------------- METHODS ---------------- */
+  async all() {
+    return this.get();
+  }
+
+  async find(id) {
+    return this.where(`${this.table}.id = ?`, [id]).first();
   }
 
   async create(data) {
@@ -52,12 +124,13 @@ class BaseModel {
 
   async update(id, data) {
     const filtered = this.isFillable(data);
-    if (Object.keys(filtered).length === 0) return null;
+    if (!Object.keys(filtered).length) return null;
 
     const fields = Object.entries(filtered)
       .map(([key]) => `${key} = ?`)
       .join(",  ");
-    const values = Object.values(filtered);
+
+    const values = [...Object.values(filtered), id];
 
     const sql = `
         UPDATE ${this.table}
@@ -65,15 +138,21 @@ class BaseModel {
         WHERE id = ?
       `;
 
-    await pool.execute(sql, [...values, id]);
+    await pool.execute(sql, values);
 
     return this.find(id);
   }
 
   async delete(id) {
-    const sql = `DELETE FROM ${this.table} WHERE id = ?`;
-    await pool.query(sql, [id]);
+    const sql = `UPDATE ${this.table} SET deleted_at = NOW() WHERE id = ?`;
+    await pool.execute(sql, [id]);
     return;
+  }
+
+  async restore(id) {
+    const sql = `UPDATE ${this.table} SET deleted_at = NULL WHERE id = ?`;
+    await pool.query(sql, [id]);
+    return this.find(id);
   }
 }
 

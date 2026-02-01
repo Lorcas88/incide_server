@@ -34,7 +34,12 @@ export const createToken = async ({ email }, expiresAt, type) => {
     await sendForgotEmail(email, user.first_name, token);
   }
 
-  // Return nothing/void for security
+  // In test environment, return the unhashed token for testing purposes
+  if (process.env.NODE_ENV === "test") {
+    return token;
+  }
+
+  // Return nothing/void for security in production
   return;
 };
 
@@ -51,6 +56,14 @@ export const confirmationUser = async ({ token }) => {
 
   if (new Date(storedToken.expires_at) < new Date()) {
     throw new AppError("Token expirado", "TOKEN_EXPIRED", 400);
+  }
+
+  // Check if email is already verified
+  const user = await userModel.find(storedToken.user_id);
+  if (user && user.email_verified_at) {
+    // Delete the token and throw error
+    await userTokenModel.delete(storedToken.id);
+    throw new AppError("Token inválido o expirado", "INVALID_TOKEN", 400);
   }
 
   // Update email_verified_at

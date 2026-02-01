@@ -9,6 +9,7 @@ class RefreshToken extends BaseModel {
     "expires_at",
     "ip_address",
     "user_agent",
+    "deleted_at",
   ];
 
   async findByTokenHash(tokenHash) {
