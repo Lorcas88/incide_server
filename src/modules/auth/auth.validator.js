@@ -6,16 +6,18 @@ export const registerValidation = [
   body("first_name")
     .trim()
     .notEmpty()
-    .escape()
     .withMessage("El nombre es requerido")
+    .custom((value) => !/[<>]/.test(value))
+    .withMessage("El nombre no puede contener caracteres especiales como < o >")
     .isLength({ min: 3, max: 50 })
     .withMessage("El nombre debe tener entre 3 y 50 caracteres"),
 
   body("last_name")
     .trim()
     .notEmpty()
-    .escape()
     .withMessage("El apellido es requerido")
+    .custom((value) => !/[<>]/.test(value))
+    .withMessage("El apellido no puede contener caracteres especiales como < o >")
     .isLength({ min: 3, max: 50 })
     .withMessage("El apellido debe tener entre 3 y 50 caracteres"),
 

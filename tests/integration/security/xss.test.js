@@ -5,7 +5,7 @@ import pool from '../../../src/config/db.js';
 jest.unstable_mockModule('../../../src/modules/auth/auth.service.js', () => ({
   registerUser: jest.fn().mockResolvedValue({
     id: 1,
-    first_name: 'Mock',
+    first_name: "O'Connor", // Mock response for valid case
     last_name: 'User',
     email: 'test@example.com',
     role_id: 3
@@ -43,31 +43,46 @@ describe('Security: XSS Prevention in User Registration', () => {
     jest.clearAllMocks();
   });
 
-  it('should sanitize first_name and last_name to prevent XSS', async () => {
+  it('should reject names containing HTML tags (XSS attempt)', async () => {
     const xssPayload = '<b>Hacker</b>';
-    // express-validator escapes / to &#x2F;
-    const safePayload = '&lt;b&gt;Hacker&lt;&#x2F;b&gt;';
+
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({
+        first_name: xssPayload,
+        last_name: 'User',
+        email: 'hacker@example.com',
+        password: 'Password123!',
+        password_confirmation: 'Password123!',
+      })
+      .expect(422);
+
+    console.log('Errors:', JSON.stringify(res.body.errors, null, 2));
+
+    expect(res.body.errors).toBeDefined();
+    expect(res.body.errors.some(e => e.message === 'El nombre no puede contener caracteres especiales como < o >')).toBe(true);
+
+    expect(registerUser).not.toHaveBeenCalled();
+  });
+
+  it('should allow legitimate names with apostrophes', async () => {
+    const validName = "O'Connor";
 
     await request(app)
       .post('/api/v1/auth/register')
       .send({
-        first_name: xssPayload,
-        last_name: xssPayload,
-        email: 'test@example.com',
+        first_name: validName,
+        last_name: 'User',
+        email: 'oconnor@example.com',
         password: 'Password123!',
         password_confirmation: 'Password123!',
       })
       .expect(201);
 
-    // Check what the service received
     expect(registerUser).toHaveBeenCalledTimes(1);
     const serviceCallArgs = registerUser.mock.calls[0][0];
 
-    // In a vulnerable state, these will be the raw payload
-    console.log('Received first_name:', serviceCallArgs.first_name);
-
-    // This expectation should FAIL initially
-    expect(serviceCallArgs.first_name).toBe(safePayload);
-    expect(serviceCallArgs.last_name).toBe(safePayload);
+    // Ensure it was NOT escaped
+    expect(serviceCallArgs.first_name).toBe(validName);
   });
 });
