@@ -22,7 +22,18 @@ import {
 import { TYPES } from "../user-tokens/userToken.constants.js";
 import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
 
-const hidden = ["password", "role_id", "email_active"];
+const hidden = [
+  "password",
+  "role_id",
+  "created_at",
+  "email_active",
+  "email_verified_at",
+  "updated_at",
+  "deleted_at",
+  "failed_login_attempts",
+  "locked_at",
+  "locked_until",
+];
 
 export const register = asyncHandler(async (req, res) => {
   const user = await registerUser(req.body);

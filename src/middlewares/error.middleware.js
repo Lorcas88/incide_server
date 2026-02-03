@@ -23,7 +23,7 @@ export const errorHandler = (err, req, res, next) => {
     res.status(status).json({ error: { code, message } });
   } else {
     // Production
-    if (err.isOperational) {
+    if (err.isOperational || err.status < 500 || err.statusCode < 500) {
       res.status(status).json({ error: { message } });
     } else {
       // Programming or other unknown error: don't leak details

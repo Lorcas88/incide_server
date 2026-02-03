@@ -10,6 +10,7 @@ describe("POST /api/v1/auth/register", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   it("should return 201 and the user created", async () => {

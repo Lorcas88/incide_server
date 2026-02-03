@@ -1,0 +1,128 @@
+
+> incide_server@1.0.0 test
+> cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles tests/integration/security/xss_attacks.test.js --forceExit
+
+  console.log
+    [dotenv@17.2.3] injecting env (10) from .env.test -- tip: ΓÜÖ∩╕Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    
+      Configuration validated successfully (test environment)
+
+      at log (src/config/config.js:119:11)
+
+(node:25924) ExperimentalWarning: VM Modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  [32mPOST  [0m [90m/api/v1/auth/register[0m ............................. [43m[30m 422 [0m [90m~ 9.344ms[0m
+  [32mPOST  [0m [90m/api/v1/auth/register[0m ............................. [43m[30m 422 [0m [90m~ 2.192ms[0m
+  [32mPOST  [0m [90m/api/v1/auth/register[0m ............................. [43m[30m 422 [0m [90m~ 1.508ms[0m
+  [32mPOST  [0m [90m/api/v1/auth/register[0m ............................. [43m[30m 422 [0m [90m~ 1.119ms[0m
+[32minfo[39m: [32mSkipping email send in test environment[39m
+  [32mPOST  [0m [90m/api/v1/auth/register[0m ............................. [42m[30m 201 [0m [90m~ 128.560ms[0m
+FAIL tests/integration/security/xss_attacks.test.js
+  Security ΓÇô XSS protection on names
+    ├ù should reject script injection in first_name (65 ms)
+    ├ù should reject script injection in last_name (18 ms)
+    ΓêÜ should reject invalid email format with scripts (17 ms)
+    ΓêÜ should reject generic HTML tags in names (14 ms)
+    ΓêÜ should accept valid names (143 ms)
+
+  ΓùÅ Security ΓÇô XSS protection on names ΓÇ║ should reject script injection in first_name
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Texto inv├ílido"
+    Received: undefined
+
+      24 |
+      25 |     expect(res.status).toBe(422);
+    > 26 |     expect(res.body.errors[0].msg).toBe("Texto inv├ílido");
+         |                                    ^
+      27 |   });
+      28 |
+      29 |   it("should reject script injection in last_name", async () => {
+
+      at Object.<anonymous> (tests/integration/security/xss_attacks.test.js:26:36)
+
+  ΓùÅ Security ΓÇô XSS protection on names ΓÇ║ should reject script injection in last_name
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Texto inv├ílido"
+    Received: undefined
+
+      37 |
+      38 |     expect(res.status).toBe(422);
+    > 39 |     expect(res.body.errors[0].msg).toBe("Texto inv├ílido");
+         |                                    ^
+      40 |   });
+      41 |
+      42 |   it("should reject invalid email format with scripts", async () => {
+
+      at Object.<anonymous> (tests/integration/security/xss_attacks.test.js:39:36)
+
+----------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------
+File                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                            
+----------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------
+All files                   |   36.33 |    15.69 |   20.54 |   36.97 |                                                                              
+ src                        |   87.87 |       60 |      50 |   87.87 |                                                                              
+  app.js                    |   87.87 |       60 |      50 |   87.87 | 35,62,66,92                                                                  
+ src/config                 |      46 |    52.27 |      50 |   46.93 |                                                                              
+  config.js                 |   42.55 |    52.27 |      50 |   43.47 | 36,42,48,56,60,68-74,82,89-113                                               
+  db.js                     |     100 |      100 |     100 |     100 |                                                                              
+  swagger.js                |     100 |      100 |     100 |     100 |                                                                              
+ src/core                   |   40.17 |    24.13 |   44.44 |   41.59 |                                                                              
+  base.model.js             |   57.57 |    54.54 |      50 |   61.29 | 22-29,41-50,101,126-155                                                      
+  mailer.js                 |   17.64 |     5.55 |      20 |   17.64 | 9,44-84,90-134,149-188,204-250                                               
+ src/middlewares            |    42.1 |    13.04 |      50 |   44.44 |                                                                              
+  auth.middleware.js        |      10 |        0 |       0 |   11.11 | 6-17                                                                         
+  authorize.middleware.js   |      40 |        0 |      50 |      40 | 5-8                                                                          
+  error.middleware.js       |      10 |        0 |       0 |      10 | 4-30                                                                         
+  rateLimiter.middleware.js |   85.71 |       50 |      50 |     100 | 7                                                                            
+  validation.middleware.js  |     100 |      100 |     100 |     100 |                                                                              
+ src/modules/auth           |   36.58 |     11.9 |      15 |   36.58 |                                                                              
+  auth.controller.js        |   34.78 |       75 |    9.09 |   34.78 | 45,50-63,73-86,95-97,103-106,112-114,120-124,128-130,134-138,142-143,149-150 
+  auth.routes.js            |     100 |      100 |     100 |     100 |                                                                              
+  auth.service.js           |   19.14 |     3.33 |      20 |   19.14 | 11-16,27,39-97,104-118,124-129                                               
+  auth.validator.js         |   44.44 |     12.5 |      25 |   44.44 | 50,100-113,153-157                                                           
+ src/modules/refresh-tokens |   15.09 |        0 |       0 |   15.38 |                                                                              
+  refreshToken.model.js     |      25 |      100 |       0 |      25 | 16-47                                                                        
+  refreshToken.service.js   |   13.33 |        0 |       0 |   13.63 | 18-30,39-114,118-124,129                                                     
+ src/modules/roles          |      50 |        0 |       0 |      50 |                                                                              
+  role.constants.js         |     100 |      100 |     100 |     100 |                                                                              
+  role.model.js             |      40 |        0 |       0 |      40 | 10-12                                                                        
+ src/modules/ticket-status  |   36.36 |        0 |       0 |      40 |                                                                              
+  ticketStatus.constants.js |     100 |      100 |     100 |     100 |                                                                              
+  ticketStatus.model.js     |      40 |        0 |       0 |      40 | 10-12                                                                        
+  ticketStatus.workflow.js  |      20 |        0 |       0 |      25 | 7-23                                                                         
+ src/modules/tickets        |   25.53 |        0 |       0 |   25.94 |                                                                              
+  ticket.controller.js      |   28.88 |      100 |       0 |   28.88 | 21-23,27-29,33-35,39-41,45-47,51-53,57-61,65-69,73-78,82-86,90-94,98-102     
+  ticket.model.js           |   18.18 |      100 |       0 |   18.18 | 15-29                                                                        
+  ticket.policy.js          |    4.34 |        0 |       0 |       5 | 6-63                                                                         
+  ticket.routes.js          |     100 |      100 |     100 |     100 |                                                                              
+  ticket.service.js         |   15.11 |        0 |       0 |   15.11 | 15,19,23,27,31-40,44-48,56-74,78-91,95-128,132-180,184-193,198-215           
+  ticket.validator.js       |      60 |        0 |       0 |      60 | 24-28                                                                        
+ src/modules/user-tokens    |   35.84 |    13.63 |      20 |   35.84 |                                                                              
+  userToken.constants.js    |     100 |      100 |     100 |     100 |                                                                              
+  userToken.model.js        |      50 |      100 |       0 |      50 | 16-25                                                                        
+  userToken.service.js      |    32.6 |    13.63 |   33.33 |    32.6 | 18,34,43,47-75,79-105                                                        
+ src/modules/users          |   31.81 |        0 |    5.26 |   31.81 |                                                                              
+  user.controller.js        |   30.43 |      100 |       0 |   30.43 | 15-17,21-25,29-31,35-39,43-47,51-55                                          
+  user.model.js             |      60 |      100 |   33.33 |      60 | 20,30                                                                        
+  user.routes.js            |     100 |      100 |     100 |     100 |                                                                              
+  user.service.js           |      20 |        0 |       0 |      20 | 9,13-18,28-33,43-61,65-70,75-84                                              
+  user.validator.js         |   22.22 |        0 |       0 |   22.22 | 58-74,131-148                                                                
+ src/utils                  |   44.59 |    18.91 |      50 |   46.96 |                                                                              
+  AppError.js               |       0 |      100 |       0 |       0 | 3-9                                                                          
+  asyncHandler.js           |     100 |      100 |     100 |     100 |                                                                              
+  logger.js                 |   42.42 |    20.83 |      50 |   48.27 | 35-38,50-69                                                                  
+  requestInfo.js            |      20 |        0 |       0 |      20 | 9-22,31                                                                      
+  utils.js                  |   60.86 |       50 |   57.14 |      65 | 15-17,29-32                                                                  
+----------------------------|---------|----------|---------|---------|------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 3 passed, 5 total
+Snapshots:   0 total
+Time:        2.678 s, estimated 4 s
+Ran all test suites matching tests/integration/security/xss_attacks.test.js.

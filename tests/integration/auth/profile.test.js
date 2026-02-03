@@ -31,6 +31,7 @@ describe("Auth Profile Endpoints", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   describe("GET /api/v1/auth/me", () => {

@@ -34,6 +34,7 @@ describe("Ticket Status Change Endpoints", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   describe("PATCH /api/v1/tickets/:id/change_status", () => {

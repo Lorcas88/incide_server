@@ -19,6 +19,7 @@ describe("Ticket CRUD Endpoints", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   describe("POST /api/v1/tickets", () => {

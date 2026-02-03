@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch --env-file=.env ./src/server.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
-    "migrate": "node --env-file=.env src/database/migrations.js",
-    "migrate:test": "node --env-file=.env.test src/database/migrations.js"
+    "dev": "cross-env NODE_ENV=development node --watch --env-file=.env.development ./src/server.js",
+    "start": "cross-env NODE_ENV=production node --env-file=.env.production ./src/server.js",
+    "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --detectOpenHandles",
+    "migrate": "cross-env NODE_ENV=development node --env-file=.env.development src/database/migrations.js",
+    "migrate:test": "cross-env NODE_ENV=test node --env-file=.env.test src/database/migrations.js",
+    "migrate:prod": "cross-env NODE_ENV=production node --env-file=.env.production src/database/migrations.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +33,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "supertest": "^7.2.2"
   }

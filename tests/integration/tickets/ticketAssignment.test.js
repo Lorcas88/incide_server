@@ -37,6 +37,7 @@ describe("Ticket Assignment Endpoints", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   describe("PATCH /api/v1/tickets/:id/self_assign", () => {

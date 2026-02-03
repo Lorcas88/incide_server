@@ -25,23 +25,28 @@ app.use(cors(config.cors));
 app.use(cookieParser());
 
 // JSON Parsing
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
-// Global rate limit - Apply rate limit to all routes
-app.use(
-  rateLimit({
-    windowMs: config.rateLimit.windowMs,
-    max: config.rateLimit.max,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-      error: {
-        code: "TOO_MANY_REQUESTS",
-        message: "Has excedido el límite de solicitudes. Intenta más tarde.",
+// URL-encoded Parsing
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Global rate limit - Apply rate limit to all routes (skip in test environment)
+if (!config.env.isTest) {
+  app.use(
+    rateLimit({
+      windowMs: config.rateLimit.windowMs,
+      max: config.rateLimit.max,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: {
+        error: {
+          code: "TOO_MANY_REQUESTS",
+          message: "Has excedido el límite de solicitudes. Intenta más tarde.",
+        },
       },
-    },
-  }),
-);
+    }),
+  );
+}
 
 // Logging HTTP - Laravel-inspired format
 app.use(

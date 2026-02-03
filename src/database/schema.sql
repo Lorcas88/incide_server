@@ -48,18 +48,22 @@ CREATE TABLE users (
     CASE WHEN deleted_at IS NULL THEN email ELSE NULL END
   ) STORED,
   password VARCHAR(255) NOT NULL,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
   role_id INT UNSIGNED NOT NULL DEFAULT 3,
   email_verified_at TIMESTAMP NULL,
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 	ON UPDATE CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
+  
+  -- Account Lockout
+  failed_login_attempts INT DEFAULT 0 COMMENT 'Counter for failed login attempts',
+  locked_at DATETIME NULL COMMENT 'Timestamp when the account was locked',
+  locked_until DATETIME NULL COMMENT 'Timestamp when the account will automatically unlock',
  
   -- Primary Keys & Unique
   CONSTRAINT pk_users PRIMARY KEY (id),
   CONSTRAINT uq_users_email UNIQUE (email_active),
-  CONSTRAINT chk_users_is_active CHECK (is_active IN (0, 1)),
+
   
   -- Foreign Keys
   CONSTRAINT fk_users_role
@@ -71,7 +75,7 @@ CREATE TABLE users (
   -- Indexes
   INDEX idx_users_email (email),
   INDEX idx_users_role (role_id),
-  INDEX idx_users_active (is_active),
+
   INDEX idx_users_deleted_at (deleted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -190,21 +194,7 @@ INSERT INTO ticket_status (name) VALUES
 ('resolved'),
 ('closed');
 
--- ============================================
--- SAMPLE DATA (Optional - for testing)
--- ============================================
 
--- Sample Admin User (password: Admin123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
-('Admin', 'User', 'admin@incide.com', '$2b$10$WWTim3jEKgr8L/1ea7H41.5Us1GlJIKMqVjEI3zgQYdbtlP6fehBG', TRUE, 1, NOW());
-
--- Sample Support User (password: Support123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
-('Support', 'User', 'support@incide.com', '$2b$10$i2cAZpTn1BpjQ2zxDYOTUuNQHqCZXXLHUq2abKzzivmv9rBCk1pVi', TRUE, 2, NOW());
-
--- Sample Regular User (password: User123!)
-INSERT INTO users (first_name, last_name, email, password, is_active, role_id, email_verified_at) VALUES
-('John', 'Doe', 'john@example.com', '$2b$10$6xo6NzUq6za0Ms/RcMBXW.2Is6T/FOHsyebEbBQ2ihmqKdjyKGGuq', TRUE, 3, NOW());
 
 -- ============================================
 -- NOTES

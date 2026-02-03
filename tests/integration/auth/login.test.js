@@ -29,6 +29,7 @@ describe("POST /api/v1/auth/login", () => {
 
   afterAll(async () => {
     await cleanDatabase();
+    await pool.end();
   });
 
   it("should return 200 and a token for valid credentials", async () => {

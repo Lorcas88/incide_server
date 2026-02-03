@@ -3,12 +3,12 @@ import jwt from "jsonwebtoken";
 import User from "../users/user.model.js";
 import { config } from "../../config/config.js";
 import AppError from "../../utils/AppError.js";
-// import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
+import { addMinutes } from "../../utils/utils.js";
 
 const userModel = new User();
 
 export const getUserById = async (id) => {
-  const user = await userModel.find(id);
+  const user = await userModel.withRole().find(id);
   if (!user) {
     throw new AppError("Registro no encontrado", "NOT_FOUND", 404);
   }
@@ -27,7 +27,7 @@ export const registerUser = async ({
     throw new AppError("Usuario ya existe", "DUPLICATE_ENTRY", 409);
   }
 
-  return await userModel.create({
+  return await userModel.withRole().create({
     first_name,
     last_name,
     email: email.toLowerCase().trim(),
@@ -41,9 +41,39 @@ export const loginUser = async ({ email, password }) => {
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
+  // Check if account is locked
+  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    throw new AppError(
+      "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
+      "ACCOUNT_LOCKED",
+      403,
+    );
+  }
+
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) {
+    // Increment failed attempts
+    const attempts = (user.failed_login_attempts || 0) + 1;
+    const updates = { failed_login_attempts: attempts };
+
+    // Lock account if max attempts reached
+    if (attempts >= 4) {
+      updates.locked_at = new Date();
+      updates.locked_until = addMinutes(15);
+    }
+
+    await userModel.update(user.id, updates);
+
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
+  }
+
+  // Reset counters on successful login
+  if (user.failed_login_attempts > 0 || user.locked_until) {
+    await userModel.update(user.id, {
+      failed_login_attempts: 0,
+      locked_at: null,
+      locked_until: null,
+    });
   }
 
   if (!user.email_verified_at) {
@@ -85,7 +115,7 @@ export const changeUserPassword = async (
     );
   }
 
-  return await userModel.update(id, {
+  return await userModel.withRole().update(id, {
     password: await bcrypt.hash(new_password, config.security.bcryptRounds),
   });
 };
