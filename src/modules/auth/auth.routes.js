@@ -24,12 +24,14 @@ import {
   loginLimiter,
   resetPasswordLimiter,
   refreshLimiter,
+  forgotPasswordLimiter,
+  registerLimiter,
 } from "../../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 
 // Register
-router.post("/register", registerValidation, register);
+router.post("/register", registerLimiter, registerValidation, register);
 
 // Login
 router.post("/login", loginLimiter, loginValidation, login);
@@ -41,7 +43,12 @@ router.post("/refresh", refreshLimiter, refresh);
 router.post("/confirm-email", confirmation);
 
 // Forgot password
-router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  forgotPasswordValidation,
+  forgotPassword,
+);
 
 // Reset password
 router.post(

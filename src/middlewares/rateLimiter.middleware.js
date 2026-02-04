@@ -1,7 +1,8 @@
 import rateLimit from "express-rate-limit";
 
-// Bypass rate limiting in test environment
-const isTesting = process.env.NODE_ENV === "test";
+// Bypass rate limiting in test environment unless explicitly enabled
+const isTesting =
+  process.env.NODE_ENV === "test" && process.env.ENABLE_RATE_LIMITS !== "true";
 
 const createLimiter = (options) => {
   return isTesting ? (req, res, next) => next() : rateLimit(options);
@@ -29,6 +30,17 @@ export const resetPasswordLimiter = createLimiter({
   },
 });
 
+export const forgotPasswordLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: {
+    error: {
+      code: "TOO_MANY_FORGOT_REQUESTS",
+      message: "Demasiadas solicitudes de recuperación de contraseña",
+    },
+  },
+});
+
 export const refreshLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -36,6 +48,17 @@ export const refreshLimiter = createLimiter({
     error: {
       code: "TOO_MANY_REFRESH_ATTEMPTS",
       message: "Demasiados intentos de refresco de sesión",
+    },
+  },
+});
+
+export const registerLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: {
+    error: {
+      code: "TOO_MANY_REGISTER_ATTEMPTS",
+      message: "Demasiados intentos de registro",
     },
   },
 });
