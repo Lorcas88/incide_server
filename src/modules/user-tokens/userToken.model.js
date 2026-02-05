@@ -15,7 +15,7 @@ class UserToken extends BaseModel {
   async findByTokenHash(tokenHash) {
     const [rows] = await this.pool.query(
       `SELECT * FROM ${this.table}
-       WHERE token_hash = ? AND used_at IS NULL`,
+       WHERE token_hash = ? AND used_at IS NULL AND deleted_at IS NULL`,
       [tokenHash],
     );
     return rows[0];
