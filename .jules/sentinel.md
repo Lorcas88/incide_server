@@ -1,0 +1,4 @@
+## 2026-02-08 - Fix User-Agent Binding in Refresh Tokens
+**Vulnerability:** User-Agent binding verification was effectively disabled because the code checked for `user_agent_hash` property on the token object, but the database returns `user_agent` column. Also, the User-Agent was stored as a raw string in one place and hashed in another.
+**Learning:** Inconsistent property naming between database columns and code expectations can silently disable security checks. Always verify that the properties accessed actually exist on the object returned from the database.
+**Prevention:** Use consistent naming conventions. Use integration tests or unit tests with realistic mocks to verify security logic paths. Ensure type definitions or strict DTOs are used if possible to catch property access errors.

@@ -23,7 +23,7 @@ export const saveToken = async (
     token_hash: tokenHash,
     expires_at: expiresAt,
     ip_address: ipAddress,
-    user_agent: userAgent,
+    user_agent: hash(userAgent),
   });
 
   // Return the plain token to send to client, NOT the DB object
@@ -71,9 +71,9 @@ export const refreshToken = async (
 
   const uaHash = hash(userAgent);
   if (
-    storedToken.user_agent_hash &&
+    storedToken.user_agent &&
     uaHash &&
-    storedToken.user_agent_hash !== uaHash
+    storedToken.user_agent !== uaHash
   ) {
     await refreshTokenModel.revokeAllForUser(storedToken.user_id);
     throw new AppError("Refresh token inválido", "REFRESH_TOKEN_INVALID", 401);
