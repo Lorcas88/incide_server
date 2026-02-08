@@ -31,7 +31,7 @@ export const resetPasswordLimiter = createLimiter({
 
 export const refreshLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 10,
   message: {
     error: {
       code: "TOO_MANY_REFRESH_ATTEMPTS",
