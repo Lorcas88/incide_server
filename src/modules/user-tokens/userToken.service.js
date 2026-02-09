@@ -119,8 +119,8 @@ export const resetPasswordUser = async ({ token, password }) => {
     password: hashedPassword,
   });
 
-  // Mark token as used
-  await userTokenModel.markAsUsed(storedToken.id);
+  // Delete token after use (hard delete)
+  await userTokenModel.delete(storedToken.id);
 
   // Revoke all existing sessions for security
   await RefreshTokenModel.revokeAllForUser(storedToken.user_id);

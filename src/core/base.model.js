@@ -13,7 +13,9 @@ class BaseModel {
     this._bindings = [];
 
     // All queries exclude "deleted" records
-    this.where(`${this.table}.deleted_at IS NULL`);
+    if (this.constructor.softDelete !== false) {
+      this.where(`${this.table}.deleted_at IS NULL`);
+    }
   }
 
   /* ---------------- QUERY BUILDER ---------------- */
@@ -38,6 +40,7 @@ class BaseModel {
 
   // filter the wheres array, removing the "deleted_at" instruction
   withDeleted() {
+    if (this.constructor.softDelete === false) return this;
     this._wheres = this._wheres.filter((w) => !w.includes("deleted_at"));
     return this;
   }
@@ -45,6 +48,7 @@ class BaseModel {
   // filter the wheres array, removing the "deleted_at" instruction
   // and add the instruction deleted_at IS NOT NULL
   onlyDeleted() {
+    if (this.constructor.softDelete === false) return this;
     this._wheres = this._wheres.filter((w) => !w.includes("deleted_at"));
     this.where(`${this.table}.deleted_at IS NOT NULL`);
     return this;
@@ -71,7 +75,9 @@ class BaseModel {
     this._bindings = [];
 
     // Restore default deleted_at filter
-    this.where(`${this.table}.deleted_at IS NULL`);
+    if (this.constructor.softDelete !== false) {
+      this.where(`${this.table}.deleted_at IS NULL`);
+    }
   }
 
   async get() {
@@ -144,7 +150,13 @@ class BaseModel {
   }
 
   async delete(id) {
-    const sql = `UPDATE ${this.table} SET deleted_at = NOW() WHERE id = ?`;
+    let sql;
+    if (this.constructor.softDelete === false) {
+      sql = `DELETE FROM ${this.table} WHERE id = ?`;
+    } else {
+      sql = `UPDATE ${this.table} SET deleted_at = NOW() WHERE id = ?`;
+    }
+
     await pool.execute(sql, [id]);
     return;
   }

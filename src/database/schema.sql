@@ -154,6 +154,7 @@ CREATE TABLE refresh_tokens (
 
 -- ============================================
 -- 6. USER TOKENS TABLE (for email verification, password reset)
+-- Uses HARD DELETE - tokens are physically removed after use
 -- ============================================
 CREATE TABLE user_tokens (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -161,9 +162,7 @@ CREATE TABLE user_tokens (
   type VARCHAR(100) NOT NULL,
   token_hash VARCHAR(255) NOT NULL,
   expires_at TIMESTAMP NOT NULL,
-  used_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP NULL COMMENT 'Soft delete timestamp',
   
   -- Foreign Keys
   CONSTRAINT fk_password_resets_user
@@ -174,7 +173,7 @@ CREATE TABLE user_tokens (
   -- Indexes
   INDEX idx_user_tokens_hash (token_hash),
   INDEX idx_user_tokens_user (user_id),
-  INDEX idx_user_tokens_deleted_at (deleted_at)
+  INDEX idx_user_tokens_expires (expires_at)
 );
 
 -- ============================================
