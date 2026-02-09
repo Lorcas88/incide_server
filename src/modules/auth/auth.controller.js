@@ -18,6 +18,7 @@ import {
   createToken,
   resetPasswordUser,
   confirmationUser,
+  resendConfirmationUser,
 } from "../user-tokens/userToken.service.js";
 import { TYPES } from "../user-tokens/userToken.constants.js";
 import { getClientIp, getUserAgent } from "../../utils/requestInfo.js";
@@ -107,6 +108,32 @@ export const confirmation = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     message: "Usuario confirmado",
+  });
+});
+
+export const reconfirmation = asyncHandler(async (req, res) => {
+  // If user exists and is not verified, create a new token
+  const user = await resendConfirmationUser(req.body);
+  if (user) {
+    const verificationToken = await createToken(
+      req.body,
+      addMinutes(60),
+      TYPES.EMAIL,
+    );
+
+    // In test environment, include the verification token in response
+    if (process.env.NODE_ENV === "test" && verificationToken) {
+      return res.status(200).json({
+        message: "Correo de confirmación enviado",
+        verification_token: verificationToken,
+      });
+    }
+  }
+
+  // Always return success to prevent email enumeration
+  res.status(200).json({
+    message:
+      "Si el correo existe y no está verificado, recibirás un email de confirmación",
   });
 });
 

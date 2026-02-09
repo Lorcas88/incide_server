@@ -28,6 +28,15 @@ class UserToken extends BaseModel {
     );
   }
 
+  async invalidateAllByType(userId, type) {
+    const [rows] = await this.pool.query(
+      `DELETE FROM ${this.table}
+       WHERE user_id = ? AND type = ?`,
+      [userId, type],
+    );
+    return rows[0];
+  }
+
   // async deleteExpired() {
   //   return this.pool.query(
   //     `DELETE FROM ${this.table} WHERE expires_at < NOW()`,

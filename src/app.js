@@ -48,7 +48,7 @@ if (!config.env.isTest) {
   );
 }
 
-// Logging HTTP - Laravel-inspired format
+// Logging HTTP
 app.use(
   morgan((tokens, req, res) => {
     const status = tokens.status(req, res);

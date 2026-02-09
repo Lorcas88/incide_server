@@ -39,3 +39,14 @@ export const refreshLimiter = createLimiter({
     },
   },
 });
+
+export const resendConfirmationLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3,
+  message: {
+    error: {
+      code: "TOO_MANY_CONFIRMATION_REQUESTS",
+      message: "Demasiadas solicitudes de reenvío de confirmación",
+    },
+  },
+});

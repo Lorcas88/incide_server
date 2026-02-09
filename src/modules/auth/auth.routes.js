@@ -11,6 +11,7 @@ import {
   forgotPassword,
   resetPassword,
   confirmation,
+  reconfirmation,
 } from "./auth.controller.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import {
@@ -24,6 +25,7 @@ import {
   loginLimiter,
   resetPasswordLimiter,
   refreshLimiter,
+  resendConfirmationLimiter,
 } from "../../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
@@ -39,6 +41,9 @@ router.post("/refresh", refreshLimiter, refresh);
 
 // Confirmation account
 router.post("/confirm-email", confirmation);
+
+// Send confirmation account again
+router.post("/resend-confirmation", resendConfirmationLimiter, reconfirmation);
 
 // Forgot password
 router.post("/forgot-password", forgotPasswordValidation, forgotPassword);

@@ -55,6 +55,7 @@ export const confirmationUser = async ({ token }) => {
   }
 
   if (new Date(storedToken.expires_at) < new Date()) {
+    await userTokenModel.delete(storedToken.id);
     throw new AppError("Token expirado", "TOKEN_EXPIRED", 400);
   }
 
@@ -73,6 +74,28 @@ export const confirmationUser = async ({ token }) => {
   await userTokenModel.delete(storedToken.id);
 
   return;
+};
+
+export const resendConfirmationUser = async ({ email }) => {
+  if (!email) {
+    throw new AppError("Email requerido", "EMAIL_REQUIRED", 400);
+  }
+
+  // Silently return if user doesn't exist (prevent email enumeration)
+  const user = await userModel.findByEmail(email);
+  if (!user) {
+    return;
+  }
+
+  // Check if already verified
+  if (user.email_verified_at) {
+    throw new AppError("La cuenta ya está verificada", "ALREADY_VERIFIED", 400);
+  }
+
+  // Invalidate all previous email verification tokens
+  await userTokenModel.invalidateAllByType(user.id, TYPES.EMAIL);
+
+  return user;
 };
 
 export const resetPasswordUser = async ({ token, password }) => {
