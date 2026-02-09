@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import AppError from "../../utils/AppError.js";
 import { hash } from "../../utils/utils.js";
 import { sendForgotEmail, sendConfirmationEmail } from "../../core/mailer.js";
+import { TYPES } from "./userToken.constants.js";
 
 const userTokenModel = new UserToken();
 const RefreshTokenModel = new RefreshToken();
@@ -56,7 +57,7 @@ export const confirmationUser = async ({ token }) => {
 
   if (new Date(storedToken.expires_at) < new Date()) {
     await userTokenModel.delete(storedToken.id);
-    throw new AppError("Token expirado", "TOKEN_EXPIRED", 400);
+    throw new AppError("Token inválido o expirado", "TOKEN_EXPIRED", 400);
   }
 
   // Check if email is already verified

@@ -7,6 +7,13 @@ import { addMinutes } from "../../utils/utils.js";
 
 const userModel = new User();
 
+// Generate a dummy hash for timing attacks protection
+// This hash will be used when the user is not found, to simulate the time taken by bcrypt.compare
+const DUMMY_HASH = bcrypt.hashSync(
+  "dummy_password",
+  config.security.bcryptRounds,
+);
+
 export const getUserById = async (id) => {
   const user = await userModel.withRole().find(id);
   if (!user) {
@@ -37,7 +44,30 @@ export const registerUser = async ({
 
 export const loginUser = async ({ email, password }) => {
   const user = await userModel.findByEmail(email);
-  if (!user) {
+  // Timing Attack Protection:
+  // Always perform bcrypt comparison, even if user is not found.
+  // If user is found, use their stored hash.
+  // If user is not found, use the dummy hash.
+  const hashToCompare = user ? user.password : DUMMY_HASH;
+  const isValidPassword = await bcrypt.compare(password, hashToCompare);
+
+  if (!user || !isValidPassword) {
+    // If user exists but password was wrong, increment failed attempts
+    if (user) {
+      // Increment failed attempts
+      const attempts = (user.failed_login_attempts || 0) + 1;
+      const updates = { failed_login_attempts: attempts };
+
+      // Lock account if max attempts reached
+      if (attempts >= 4) {
+        updates.locked_at = new Date();
+        updates.locked_until = addMinutes(15);
+      }
+
+      await userModel.update(user.id, updates);
+    }
+
+    // Always return generic error
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
@@ -48,23 +78,6 @@ export const loginUser = async ({ email, password }) => {
       "ACCOUNT_LOCKED",
       403,
     );
-  }
-
-  const isValidPassword = await bcrypt.compare(password, user.password);
-  if (!isValidPassword) {
-    // Increment failed attempts
-    const attempts = (user.failed_login_attempts || 0) + 1;
-    const updates = { failed_login_attempts: attempts };
-
-    // Lock account if max attempts reached
-    if (attempts >= 4) {
-      updates.locked_at = new Date();
-      updates.locked_until = addMinutes(15);
-    }
-
-    await userModel.update(user.id, updates);
-
-    throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
   }
 
   // Reset counters on successful login
