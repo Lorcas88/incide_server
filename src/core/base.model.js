@@ -108,7 +108,18 @@ class BaseModel {
   }
 
   async find(id) {
-    return this.where(`${this.table}.id = ?`, [id]).first();
+    return this.findOne({ id });
+  }
+
+  async findOne(conditions) {
+    const keys = Object.keys(conditions);
+    const values = Object.values(conditions);
+
+    keys.forEach((key, index) => {
+      this.where(`${this.table}.${key} = ?`, [values[index]]);
+    });
+
+    return this.first();
   }
 
   async create(data) {
