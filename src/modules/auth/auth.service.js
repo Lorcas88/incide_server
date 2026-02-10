@@ -51,6 +51,17 @@ export const loginUser = async ({ email, password }) => {
   const hashToCompare = user ? user.password : DUMMY_HASH;
   const isValidPassword = await bcrypt.compare(password, hashToCompare);
 
+  // Check if account is locked
+  // We check this BEFORE verifying if password is correct to prevent password enumeration
+  // via error message differences on locked accounts.
+  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    throw new AppError(
+      "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
+      "ACCOUNT_LOCKED",
+      403,
+    );
+  }
+
   if (!user || !isValidPassword) {
     // If user exists but password was wrong, increment failed attempts
     if (user) {
@@ -69,15 +80,6 @@ export const loginUser = async ({ email, password }) => {
 
     // Always return generic error
     throw new AppError("Credenciales inválidas", "INVALID_CREDENTIALS", 401);
-  }
-
-  // Check if account is locked
-  if (user.locked_until && new Date(user.locked_until) > new Date()) {
-    throw new AppError(
-      "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
-      "ACCOUNT_LOCKED",
-      403,
-    );
   }
 
   // Reset counters on successful login
