@@ -1,0 +1,4 @@
+## 2025-05-27 - [CRITICAL] Unchecked Null Access on User Lookup
+**Vulnerability:** The `loginUser` service function attempted to access `user.locked_until` immediately after looking up a user by email, without verifying if the user existed. This caused a server crash (DoS) when a non-existent email was provided.
+**Learning:** While `bcrypt` comparison was protected against timing attacks using `DUMMY_HASH`, the subsequent account lockout check inadvertently reintroduced a vulnerability by assuming the user object was always present.
+**Prevention:** Always verify object existence (`if (user && ...)`) before accessing properties, especially in authentication flows where user input determines the object's existence. Unit tests should explicitly cover "not found" scenarios for all service methods.
