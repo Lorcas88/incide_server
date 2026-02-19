@@ -119,6 +119,29 @@ describe("TicketPolicy", () => {
     });
   });
 
+  describe("canSelfAssign", () => {
+    it("should allow support to self-assign unassigned tickets", () => {
+      const support = { id: 5, role_id: ROLES.SUPPORT };
+      const ticket = { created_by: 1, assigned_to: null };
+
+      expect(TicketPolicy.canSelfAssign(support, ticket)).toBe(true);
+    });
+
+    it("should deny support from self-assigning assigned tickets", () => {
+      const support = { id: 5, role_id: ROLES.SUPPORT };
+      const ticket = { created_by: 1, assigned_to: 6 };
+
+      expect(TicketPolicy.canSelfAssign(support, ticket)).toBe(false);
+    });
+
+    it("should deny user from self-assigning tickets", () => {
+      const user = { id: 1, role_id: ROLES.USER };
+      const ticket = { created_by: 1, assigned_to: null };
+
+      expect(TicketPolicy.canSelfAssign(user, ticket)).toBe(false);
+    });
+  });
+
   describe("canBeAssignedTo", () => {
     it("should deny assigning to regular user", () => {
       const user = { id: 1, role_id: ROLES.USER };
