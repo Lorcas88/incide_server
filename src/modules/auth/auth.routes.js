@@ -23,6 +23,8 @@ import {
 } from "./auth.validator.js";
 import {
   loginLimiter,
+  registerLimiter,
+  forgotPasswordLimiter,
   resetPasswordLimiter,
   refreshLimiter,
   resendConfirmationLimiter,
@@ -31,7 +33,7 @@ import {
 const router = Router();
 
 // Register
-router.post("/register", registerValidation, register);
+router.post("/register", registerLimiter, registerValidation, register);
 
 // Login
 router.post("/login", loginLimiter, loginValidation, login);
@@ -46,7 +48,7 @@ router.post("/confirm-email", confirmation);
 router.post("/resend-confirmation", resendConfirmationLimiter, reconfirmation);
 
 // Forgot password
-router.post("/forgot-password", forgotPasswordValidation, forgotPassword);
+router.post("/forgot-password", forgotPasswordLimiter, forgotPasswordValidation, forgotPassword);
 
 // Reset password
 router.post(

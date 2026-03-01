@@ -1,0 +1,4 @@
+## 2024-05-18 - [Missing Rate Limits on Sensitive State-Change Endpoints]
+**Vulnerability:** The `/register` and `/forgot-password` endpoints lacked explicit rate limiting in `auth.routes.js`. While a global rate limit exists, it's typically too permissible for sensitive unauthenticated endpoints, allowing attackers to perform email enumeration, spam registration, or brute-forcing of password reset tokens.
+**Learning:** Specific, stricter rate limiters must be explicitly defined for high-value unauthenticated routes. The project memory explicitly requires: Login (5/15min), Register (5/hour), Forgot Password (3/hour), Reset Password (3/15min), and Refresh Token (10/15min).
+**Prevention:** Always define custom limiters using `express-rate-limit` in `rateLimiter.middleware.js` and explicitly apply them directly in the router definition for all unauthenticated state-change endpoints.
