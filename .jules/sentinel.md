@@ -1,0 +1,4 @@
+## 2024-05-24 - [Timing Attack / User Enumeration via Unhandled TypeError]
+**Vulnerability:** The `loginUser` function contained a bug where accessing properties (specifically `locked_until`) on a non-existent `user` object threw a `TypeError`. This bypassed the constant-time operation designed to protect against timing attacks, leaking whether an email address exists in the system or not due to differential response times and 500 status codes.
+**Learning:** Defensive programming must be strictly applied when accessing properties of objects that can be null or undefined (like database query results). Constant-time comparison logic relies heavily on the premise that no prior operations will crash and terminate the control flow prematurely.
+**Prevention:** Always verify the existence of an object before attempting to access its properties, especially in authentication logic, or use optional chaining (`user?.locked_until`).
