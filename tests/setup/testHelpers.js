@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import pool from "../../src/config/db.js";
 import { ROLES } from "../../src/modules/roles/role.constants.js";
+import { config } from "../../src/config/config.js";
 import request from "supertest";
 import app from "../../src/app.js";
 
@@ -34,7 +35,7 @@ export const createTestUser = async ({
   role_id = ROLES.USER,
   verified = true,
 } = {}) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, config.security.bcryptRounds);
 
   const [result] = await pool.query(
     `INSERT INTO users (first_name, last_name, email, password, role_id, email_verified_at)

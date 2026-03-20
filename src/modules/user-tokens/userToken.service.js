@@ -3,6 +3,7 @@ import RefreshToken from "../refresh-tokens/refreshToken.model.js";
 import User from "../users/user.model.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import { config } from "../../config/config.js";
 import AppError from "../../utils/AppError.js";
 import { hash } from "../../utils/utils.js";
 import { sendForgotEmail, sendConfirmationEmail } from "../../core/mailer.js";
@@ -115,7 +116,7 @@ export const resetPasswordUser = async ({ token, password }) => {
   }
 
   // Update password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, config.security.bcryptRounds);
   await userModel.update(storedToken.user_id, {
     password: hashedPassword,
   });

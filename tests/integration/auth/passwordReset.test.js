@@ -3,6 +3,7 @@ import app from "../../../src/app.js";
 import bcrypt from "bcrypt";
 import pool from "../../../src/config/db.js";
 import crypto from "crypto";
+import { config } from "../../../src/config/config.js";
 
 describe("Password Reset Flow", () => {
   const testUser = {
@@ -19,7 +20,7 @@ describe("Password Reset Flow", () => {
     await pool.query("DELETE FROM users");
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
-    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    const hashedPassword = await bcrypt.hash(testUser.password, config.security.bcryptRounds);
 
     // Create test user with verified email
     const [result] = await pool.query(

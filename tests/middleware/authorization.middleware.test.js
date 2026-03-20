@@ -14,7 +14,7 @@ describe("Authorization Middleware - Role-Based Access Control", () => {
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
     // Create admin user
-    const hashedPassword = await bcrypt.hash("Test123!", 10);
+    const hashedPassword = await bcrypt.hash("Test123!", config.security.bcryptRounds);
     const [adminResult] = await pool.query(
       `INSERT INTO users (first_name, last_name, email, password, role_id, email_verified_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,

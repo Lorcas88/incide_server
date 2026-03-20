@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../../../src/app.js";
 import pool from "../../../src/config/db.js";
 import bcrypt from "bcrypt";
+import { config } from "../../../src/config/config.js";
 
 describe("Query Scopes and User Restore", () => {
   let adminToken;
@@ -21,7 +22,7 @@ describe("Query Scopes and User Restore", () => {
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
     // Create admin user
-    const hashedPassword = await bcrypt.hash(adminUser.password, 10);
+    const hashedPassword = await bcrypt.hash(adminUser.password, config.security.bcryptRounds);
     await pool.query(
       `INSERT INTO users (first_name, last_name, email, password, role_id, email_verified_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
