@@ -1,0 +1,4 @@
+## 2024-03-24 - [Missing Rate Limiting on Register and Forgot Password]
+**Vulnerability:** The application applied `express-rate-limit` selectively for certain state-changing unauthenticated endpoints (`login`, `refresh`, `reset password`, `resend confirmation`) but missed `register` and `forgot-password`, creating an avenue for email spam, resource exhaustion, and possible denial-of-service or bot abuse.
+**Learning:** Developers can sometimes assume that global rate limits are sufficient, but specific, stricter rate limits are necessary for operations that create resources or trigger emails.
+**Prevention:** Always verify that all unauthenticated endpoints—especially those modifying state or sending notifications (e.g. registration, forgot password, OTP generation)—have explicit, tailored rate limits applied at the route level.
