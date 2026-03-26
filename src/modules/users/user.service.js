@@ -58,7 +58,13 @@ export const updateUser = async (id, data) => {
     data.password = await bcrypt.hash(password, config.security.bcryptRounds);
   }
 
-  return await userModel.update(id, data);
+  // Prevent mass assignment by filtering only allowed fields
+  const updatable = ["first_name", "last_name", "email", "password", "role_id"];
+  const dataFilter = Object.fromEntries(
+    Object.entries(data).filter(([key]) => updatable.includes(key)),
+  );
+
+  return await userModel.update(id, dataFilter);
 };
 
 export const deleteUser = async (id) => {
