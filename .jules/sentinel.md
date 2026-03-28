@@ -1,0 +1,4 @@
+## 2026-03-28 - [Use config bcrypt rounds for password reset]
+**Vulnerability:** The password reset logic in `src/modules/user-tokens/userToken.service.js` hardcoded the bcrypt salt rounds to 10 (`bcrypt.hash(password, 10)`) instead of using the centrally configured application value (`config.security.bcryptRounds`).
+**Learning:** Hardcoded cryptographic parameters bypass application-wide security policies. If the organization decides to increase the salt rounds due to advances in computing power, the reset password flow would remain weak. It also demonstrates an inconsistency in security postures across different authentication flows.
+**Prevention:** Always reference centralized configuration for cryptographic parameters (e.g., salt rounds, key lengths, algorithms) to ensure consistency and facilitate future security upgrades.
