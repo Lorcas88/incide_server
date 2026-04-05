@@ -1,0 +1,4 @@
+## 2024-05-18 - User Enumeration via Missing Null Check in Authentication
+**Vulnerability:** In `auth.service.js`, the login check evaluated `user.locked_until` before validating that `user` was defined. If an invalid email was provided, `user` would be `undefined`, causing a `TypeError` and exposing a 500 server error, creating a User Enumeration vulnerability via error differentials.
+**Learning:** Even when there's logic intended to prevent enumeration (like checking locking before validating the password), failing to verify the existence of the object itself can bypass that protection entirely. This is an instance of an authentication bypass / information disclosure due to missing fundamental null checking in sensitive code paths.
+**Prevention:** Always verify that an entity fetched from the database exists before accessing its properties, especially in authentication logic where error differentials can leak information.
