@@ -1,0 +1,4 @@
+## 2024-04-08 - [User Enumeration via Server Error in Login]
+**Vulnerability:** A missing null check on the user object in the login service (`user.locked_until`) led to a TypeError and subsequent 500 Internal Server Error when authenticating with a non-existent email address. This error disparity could allow an attacker to enumerate valid email addresses based on whether the server responds with a 401 (valid user, wrong password) or a 500 (invalid user).
+**Learning:** Even when using timing attack protections (like `DUMMY_HASH`), differential error handling or unhandled exceptions before the generic failure response can inadvertently leak information about account existence.
+**Prevention:** Always verify the existence of the retrieved record (e.g., `user`) before accessing its properties during authentication flows, ensuring a uniform code path and identical generic error responses for both invalid users and incorrect passwords.
