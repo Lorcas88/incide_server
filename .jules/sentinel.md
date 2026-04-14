@@ -1,0 +1,4 @@
+## 2024-03-24 - [Fix] SQL Injection in BaseModel.findOne
+**Vulnerability:** The `BaseModel.findOne` method iterates over keys in the `conditions` object and directly interpolates them into the `WHERE` clause without validation (`this.where(\`${this.table}.${key} = ?\`, [values[index]]);`). This makes the application vulnerable to SQL injection via column names.
+**Learning:** Object keys used in dynamic query builders need to be sanitized or validated since prepared statements (`?`) only protect the values, not the identifiers like table or column names.
+**Prevention:** Implement strict validation on dynamically generated column names (e.g., using a regex like `/^[a-zA-Z0-9_]+$/`) to ensure they only contain safe characters before injecting them into the query structure.
