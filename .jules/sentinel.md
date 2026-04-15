@@ -1,0 +1,4 @@
+## 2024-04-15 - [CRITICAL] Prevent User Enumeration and App Crash on Failed Login
+**Vulnerability:** A `TypeError` could be thrown during login when checking the `user.locked_until` property if the `user` object was null (i.e. user not found). This error bypasses the constant-time fake hash check, crashes the application flow, and exposes to attackers whether an email exists or not in the database (user enumeration).
+**Learning:** Checking properties on potentially null objects in critical authentication flows can not only cause a Denial of Service (app crash) but also leak sensitive information (user existence) by circumventing generic error handlers.
+**Prevention:** Always implement null checks (e.g. `user && user.locked_until`) before accessing properties of objects that represent user records, especially in authentication logic.
