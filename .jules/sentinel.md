@@ -1,0 +1,4 @@
+## 2024-04-24 - [CRITICAL] SQL Injection in BaseModel findOne
+**Vulnerability:** The `BaseModel.findOne(conditions)` method iterates over the keys of the `conditions` object and directly interpolates them into the SQL WHERE clause (`this.where(\`${this.table}.${key} = ?\`, [values[index]])`). If the keys in the `conditions` object originate from user input (even if the values are parameterized), an attacker can inject arbitrary SQL.
+**Learning:** Even when using parameterized queries for values (the `?` placeholder), the column names themselves must not be concatenated or interpolated directly from unsanitized input. The underlying ORM/query builder must enforce safe keys.
+**Prevention:** Strictly validate condition keys against an alphanumeric/underscore regex (`/^[a-zA-Z0-9_]+$/`) before using them in the query, or use an explicitly defined list of allowed queryable columns.
