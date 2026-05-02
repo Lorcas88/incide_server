@@ -1,0 +1,4 @@
+## 2024-05-02 - User Enumeration Vulnerability via TypeError on Account Lockout Check
+**Vulnerability:** In `loginUser`, when querying the database for a non-existent email, `user` resolves to `null`. The lockout check subsequently attempted to read `user.locked_until`, resulting in a `TypeError: Cannot read properties of null` and a 500 error instead of a 401 response, which allows attackers to enumerate valid and invalid email addresses.
+**Learning:** Always verify that an object fetched from the database is not `null` or `undefined` before accessing its properties, particularly in security-critical paths where unhandled exceptions can leak existence data.
+**Prevention:** Use explicit null checks (`user && user.property`) or optional chaining (`user?.property`) when evaluating fields on objects that could potentially be missing.
