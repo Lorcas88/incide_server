@@ -1,6 +1,20 @@
 node_modules/
+dist/
 coverage/
+
 # Environment files (keep development and test in Git for single developer)
+.env
 .env.production
-TODO.md
+.env.development
+
 logs/
+*.log
+
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+.pnp.cjs
+.pnp.loader.mjs

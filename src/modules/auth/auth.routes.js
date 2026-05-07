@@ -71,7 +71,7 @@ router.get("/me", authMiddleware, me);
 router.delete("/unsubscribe", authMiddleware, destroy);
 
 // Logout
-router.post("/logout", authMiddleware, logout);
+router.post("/logout", logout);
 
 // Logout of all devices
 router.post("/logout-all", authMiddleware, logoutAll);
