@@ -1,6 +1,8 @@
 node_modules/
 coverage/
 # Environment files (keep development and test in Git for single developer)
+.env.development
 .env.production
 TODO.md
 logs/
+*.log

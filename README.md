@@ -108,10 +108,10 @@ This separation ensures:
 3. **Set up environment variables**
 
    ```bash
-   cp .env.example .env
+   cp .env.example .env.development
    ```
 
-   Edit `.env` with your configuration:
+   Edit `.env.development` with your configuration:
 
    ```env
    # Server
