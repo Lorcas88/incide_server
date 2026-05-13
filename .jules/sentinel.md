@@ -1,0 +1,4 @@
+## 2025-05-13 - [Fix] Null Exception vulnerability leading to User Enumeration
+**Vulnerability:** A `TypeError` occurred in `src/modules/auth/auth.service.js` during the lockout check when a user attempted to log in with an email address not present in the database. This allowed attackers to enumerate valid users based on the `500 Internal Server Error` response versus the `401 Unauthorized` for valid users with incorrect passwords.
+**Learning:** We must ensure object references are safely accessed, particularly in authentication flows where error paths can reveal implicit information. An unchecked assumption about an object's existence prior to accessing its properties can lead to application panics that leak state.
+**Prevention:** Always verify the object exists before attempting to read its properties, especially in functions dealing with unknown input data (like login). E.g., using `if (user && user.property)` instead of `if (user.property)`.
