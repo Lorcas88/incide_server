@@ -7,6 +7,17 @@ const createLimiter = (options) => {
   return isTesting ? (req, res, next) => next() : rateLimit(options);
 };
 
+export const registerLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: {
+    error: {
+      code: "TOO_MANY_REGISTER_ATTEMPTS",
+      message: "Demasiados intentos de registro",
+    },
+  },
+});
+
 export const loginLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -14,6 +25,17 @@ export const loginLimiter = createLimiter({
     error: {
       code: "TOO_MANY_LOGIN_ATTEMPTS",
       message: "Demasiados intentos de inicio de sesión",
+    },
+  },
+});
+
+export const forgotPasswordLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3,
+  message: {
+    error: {
+      code: "TOO_MANY_FORGOT_PASSWORD_REQUESTS",
+      message: "Demasiadas solicitudes de olvido de contraseña",
     },
   },
 });
