@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Information Disclosure / Crash on Login
+**Vulnerability:** The `loginUser` function in `auth.service.js` accessed `user.locked_until` without checking if `user` was null. This caused a `TypeError` when a user was not found, resulting in a 500 error instead of a handled 401 error. This could expose whether a user exists (via different error codes/timing) or crash the request handler.
+**Learning:** Always validate that an object retrieved from a database exists before accessing its properties. In this case, `userModel.findByEmail` returns `null` if not found, but the code assumed `user` existed before the password check failed.
+**Prevention:** Use optional chaining (`?.`) or explicit checks (`user && user.property`) when dealing with potentially null objects. Ensure error paths are consistent regardless of user existence to prevent enumeration.
