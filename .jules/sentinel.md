@@ -1,0 +1,4 @@
+## 2025-02-23 - Fix SQL Injection in Query Builder
+**Vulnerability:** The `BaseModel.findOne(conditions)` method iterated over the keys of the `conditions` object and directly interpolated them into SQL strings (`${this.table}.${key} = ?`). This exposed the application to severe SQL injection attacks if any dynamic or unvalidated object keys were passed into it (e.g. `req.query`).
+**Learning:** Even when parameterized queries are used for the *values* (`?`), the *column names* or object keys cannot be parameterized by most SQL drivers. If a query builder constructs its SQL using object keys, these keys must be explicitly validated against a strict allowlist (e.g., alphanumeric and underscores) or matched against a known column list before interpolation.
+**Prevention:** Always validate dynamic keys or column names against a strict regex (`/^[a-zA-Z0-9_]+$/`) or an explicit schema before injecting them into a SQL string, even if using an ORM or query builder.
