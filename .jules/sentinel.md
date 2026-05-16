@@ -1,0 +1,4 @@
+## 2026-05-16 - Prevent SQL Injection via Unsanitized Object Keys in Model Queries
+**Vulnerability:** The custom query builder `BaseModel.findOne()` iterated over an object's keys and directly interpolated them into the SQL WHERE clause string (e.g., `this.where("${this.table}.${key} = ?", [values[index]])`). Parameterized queries (`?`) only protect the values array, not the interpolated column names.
+**Learning:** In dynamically constructed queries, user-controlled object keys (even indirectly passed through service layers) can lead to critical SQL injection if interpolated into column identifiers or table names without strict validation.
+**Prevention:** Always validate dynamically constructed column identifiers against a strict allowlist (e.g., `/^[a-zA-Z0-9_]+$/`) before string interpolation. Never assume object keys are safe from manipulation.
