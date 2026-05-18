@@ -116,6 +116,9 @@ class BaseModel {
     const values = Object.values(conditions);
 
     keys.forEach((key, index) => {
+      if (!/^[a-zA-Z0-9_]+$/.test(key)) {
+        throw new Error(`Invalid column name for findOne condition: ${key}`);
+      }
       this.where(`${this.table}.${key} = ?`, [values[index]]);
     });
 
