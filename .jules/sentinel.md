@@ -1,0 +1,4 @@
+## 2024-05-22 - Fix SQL Injection in Query Builder (BaseModel)
+**Vulnerability:** SQL Injection in dynamic query builder (`BaseModel.findOne`). The method accepted an object where the keys were directly interpolated into the SQL string (`${this.table}.${key} = ?`). If an attacker controlled the condition keys, they could inject arbitrary SQL clauses (e.g., `{'id = 1 OR 1=1': 1}`).
+**Learning:** Dynamic query builders that construct SQL using user-provided object keys must strictly validate those keys, even when using parameterized values, because placeholders only protect values, not column names or SQL structure.
+**Prevention:** Always validate dynamically interpolated SQL identifiers (like table names or column names) against a strict whitelist or regex (e.g., `/^[a-zA-Z0-9_]+$/`) before interpolating them into a query string.
