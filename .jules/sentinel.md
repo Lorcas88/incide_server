@@ -1,0 +1,4 @@
+## 2024-05-27 - [CRITICAL] Fix SQL Injection in BaseModel Query Builder
+**Vulnerability:** The ORM's `findOne` method directly interpolated condition keys into the SQL query without any sanitization (`this.where(\`${this.table}.${key} = ?\`, ...)`), enabling SQL injection if any unvalidated user input was passed as a condition key.
+**Learning:** Even though parameterized queries (`?`) are used for values, column names and identifiers cannot be parameterized. If an attacker can control the object keys passed into `findOne`, they could inject arbitrary SQL conditions.
+**Prevention:** Always validate table names, column names, and other SQL identifiers against a strict allowlist or regex (e.g., `/^[a-zA-Z0-9_]+$/`) before interpolating them into a raw query string within custom query builders.
