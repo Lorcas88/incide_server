@@ -1,0 +1,4 @@
+## 2026-05-28 - [CRITICAL] Fix SQL Injection vulnerability in BaseModel.findOne
+**Vulnerability:** Object keys passed as conditions to `BaseModel.findOne()` were being directly interpolated into the SQL query without prior validation or sanitization, opening up SQL injection vulnerabilities if user input controls the keys.
+**Learning:** Even when parameterized queries are used for the *values*, SQL injection can occur if the *column names* or *query structure* can be controlled by the user. Object keys passed to query builders are a common vector for this type of vulnerability if not validated.
+**Prevention:** Always validate dynamically constructed column names or query keys against a strict allowlist or a regex like `/^[a-zA-Z0-9_]+$/` to ensure they only contain safe characters before injecting them into the SQL string.
