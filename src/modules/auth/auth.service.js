@@ -54,7 +54,7 @@ export const loginUser = async ({ email, password }) => {
   // Check if account is locked
   // We check this BEFORE verifying if password is correct to prevent password enumeration
   // via error message differences on locked accounts.
-  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+  if (user && user.locked_until && new Date(user.locked_until) > new Date()) {
     throw new AppError(
       "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
       "ACCOUNT_LOCKED",
@@ -83,7 +83,7 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // Reset counters on successful login
-  if (user.failed_login_attempts > 0 || user.locked_until) {
+  if (user && (user.failed_login_attempts > 0 || user.locked_until)) {
     await userModel.update(user.id, {
       failed_login_attempts: 0,
       locked_at: null,
