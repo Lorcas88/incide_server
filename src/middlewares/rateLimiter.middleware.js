@@ -18,6 +18,17 @@ export const loginLimiter = createLimiter({
   },
 });
 
+export const registerLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: {
+    error: {
+      code: "TOO_MANY_REGISTER_ATTEMPTS",
+      message: "Demasiados intentos de registro",
+    },
+  },
+});
+
 export const resetPasswordLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 3,
@@ -25,6 +36,17 @@ export const resetPasswordLimiter = createLimiter({
     error: {
       code: "TOO_MANY_RESET_REQUESTS",
       message: "Demasiadas solicitudes de recuperación",
+    },
+  },
+});
+
+export const forgotPasswordLimiter = createLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3,
+  message: {
+    error: {
+      code: "TOO_MANY_FORGOT_PASSWORD_REQUESTS",
+      message: "Demasiadas solicitudes de recuperación de contraseña",
     },
   },
 });
