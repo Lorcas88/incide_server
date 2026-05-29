@@ -2,8 +2,8 @@ import request from "supertest";
 import app from "../../../src/app.js";
 import bcrypt from "bcrypt";
 import pool from "../../../src/config/db.js";
+import { config } from "../../../src/config/config.js";
 // import jwt from "jsonwebtoken";
-// import { config } from "../src/config/config.js";
 
 describe("Refresh Token Flow", () => {
   const testUser = {
@@ -22,7 +22,7 @@ describe("Refresh Token Flow", () => {
     await pool.query("DELETE FROM users");
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
-    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    const hashedPassword = await bcrypt.hash(testUser.password, config.security.bcryptRounds);
 
     // Create test user with verified email
     const [result] = await pool.query(

@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../../../src/app.js";
 import bcrypt from "bcrypt";
 import pool from "../../../src/config/db.js";
+import { config } from "../../../src/config/config.js";
 import { ROLES } from "../../../src/modules/roles/role.constants.js";
 
 describe("User Management Endpoints (Admin Only)", () => {
@@ -31,7 +32,7 @@ describe("User Management Endpoints (Admin Only)", () => {
     await pool.query("ALTER TABLE users AUTO_INCREMENT = 1");
 
     // Create admin user
-    const hashedPasswordAdmin = await bcrypt.hash(adminUser.password, 10);
+    const hashedPasswordAdmin = await bcrypt.hash(adminUser.password, config.security.bcryptRounds);
     await pool.query(
       `INSERT INTO users (first_name, last_name, email, password, role_id, email_verified_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
@@ -45,7 +46,7 @@ describe("User Management Endpoints (Admin Only)", () => {
     );
 
     // Create regular user
-    const hashedPasswordUser = await bcrypt.hash(regularUser.password, 10);
+    const hashedPasswordUser = await bcrypt.hash(regularUser.password, config.security.bcryptRounds);
     await pool.query(
       `INSERT INTO users (first_name, last_name, email, password, role_id, email_verified_at)
        VALUES (?, ?, ?, ?, ?, NOW())`,
