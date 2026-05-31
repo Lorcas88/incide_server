@@ -1,0 +1,4 @@
+## 2024-05-31 - [Hardcoded bcrypt rounds]
+**Vulnerability:** Found a hardcoded salt rounds value (10) for bcrypt hashing in `src/modules/user-tokens/userToken.service.js` within the `resetPasswordUser` function.
+**Learning:** Hardcoding cryptographic parameters in individual functions undermines centralized security configurations (e.g., `config.security.bcryptRounds`) and makes it harder to consistently update algorithms across the entire application.
+**Prevention:** Always use dynamically configured, environment-based cryptographic parameters defined in centralized configuration files (`config.js`) to maintain uniform security posture and ease of updates.
