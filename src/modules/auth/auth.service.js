@@ -54,7 +54,7 @@ export const loginUser = async ({ email, password }) => {
   // Check if account is locked
   // We check this BEFORE verifying if password is correct to prevent password enumeration
   // via error message differences on locked accounts.
-  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+  if (user && user.locked_until && new Date(user.locked_until) > new Date()) {
     throw new AppError(
       "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
       "ACCOUNT_LOCKED",
@@ -83,7 +83,7 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // Reset counters on successful login
-  if (user.failed_login_attempts > 0 || user.locked_until) {
+  if (user && (user.failed_login_attempts > 0 || user.locked_until)) {
     await userModel.update(user.id, {
       failed_login_attempts: 0,
       locked_at: null,
@@ -91,7 +91,7 @@ export const loginUser = async ({ email, password }) => {
     });
   }
 
-  if (!user.email_verified_at) {
+  if (user && !user.email_verified_at) {
     throw new AppError(
       "Cuenta no verificada. Revisa tu correo.",
       "EMAIL_NOT_VERIFIED",
@@ -99,7 +99,7 @@ export const loginUser = async ({ email, password }) => {
     );
   }
 
-  if (user.deleted_at) {
+  if (user && user.deleted_at) {
     throw new AppError("Esta cuenta ha sido eliminada", "ACCOUNT_DELETED", 403);
   }
 
