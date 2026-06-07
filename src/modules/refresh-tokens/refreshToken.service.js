@@ -114,7 +114,7 @@ export const revokeToken = async (token) => {
   if (!token) return;
 
   const tokenHash = hash(token);
-  const stored = await refreshTokenModel.findOne({ token: tokenHash });
+  const stored = await refreshTokenModel.findOne({ token_hash: tokenHash });
 
   if (stored) {
     await refreshTokenModel.revoke(stored.id);
