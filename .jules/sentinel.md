@@ -1,0 +1,4 @@
+## 2024-06-08 - [SQL Injection Prevention in Core BaseModel]
+**Vulnerability:** The core `BaseModel.findOne` method was interpolating keys directly from the `conditions` argument into SQL strings (`${this.table}.${key} = ?`). Even though values were parameterized, allowing unvalidated keys to enter the SQL query creates an SQL injection vulnerability (specifically regarding column names) if an attacker can ever control the properties passed in the conditions object.
+**Learning:** Raw string interpolation for column names or structural parts of an SQL query bypasses parameterized values protection. Keys derived from unknown inputs can alter query logic or cause syntax errors if not explicitly permitted.
+**Prevention:** Always validate any string being interpolated directly into an SQL statement using a strict whitelist or regex matching standard SQL identifier formats (e.g., `/^[a-zA-Z0-9_]+$/`).
