@@ -115,7 +115,12 @@ class BaseModel {
     const keys = Object.keys(conditions);
     const values = Object.values(conditions);
 
+    const validKeyRegex = /^[a-zA-Z0-9_]+$/;
+
     keys.forEach((key, index) => {
+      if (!validKeyRegex.test(key)) {
+        throw new Error(`Invalid column name: ${key}`);
+      }
       this.where(`${this.table}.${key} = ?`, [values[index]]);
     });
 

@@ -1,0 +1,4 @@
+## 2024-05-24 - [SQL Injection Prevention in BaseModel Query Builder]
+**Vulnerability:** The `BaseModel.findOne` method was interpolating Object keys directly into SQL queries (`${this.table}.${key} = ?`) without any validation or escaping, allowing potential SQL injection attacks if an attacker could control the keys of the `conditions` object.
+**Learning:** Even when using parameterized queries for values (the `?` placeholders), the column names (keys) themselves must be strictly validated or escaped if they are dynamically generated from user input or unvalidated data structures, as parameterized queries only protect the values.
+**Prevention:** Always validate dynamic column names against an allowlist or a strict regex (like `/^[a-zA-Z0-9_]+$/`) before interpolating them into SQL statements to ensure they are safe identifiers.
