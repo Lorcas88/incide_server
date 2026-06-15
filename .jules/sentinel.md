@@ -1,0 +1,4 @@
+## 2024-06-15 - [Critical SQL Injection in `BaseModel.findOne`]
+**Vulnerability:** The `findOne(conditions)` method in `BaseModel` directly iterated over the keys of the `conditions` object and interpolated them into the SQL WHERE clause string (e.g., `this.where(\`${this.table}.${key} = ?\`, ...)`). This allowed attackers to inject arbitrary SQL statements if they could control the keys of the conditions object.
+**Learning:** Even when values are parameterized using `?`, dynamically constructing SQL clauses using unsanitized object keys is a critical injection vector. ORMs and Query Builders must validate column names against an allowlist or a strict regex.
+**Prevention:** Always validate dynamically provided column names or object keys against a strict regex (e.g., `/^[a-zA-Z0-9_]+$/`) before interpolating them into a SQL statement, even in a custom query builder.
