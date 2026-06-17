@@ -1,0 +1,4 @@
+## 2024-05-24 - [User Enumeration / DoS via Unhandled Promise Rejection]
+**Vulnerability:** User enumeration and potential unhandled TypeError DoS in login due to a missing null check on the `user` object before evaluating `user.locked_until`.
+**Learning:** The `locked_until` check was placed before validating the password to prevent enumeration attacks via error differences, but ironically exposed an enumeration vulnerability (and 500 status code crash) by throwing an unhandled TypeError for non-existent users before the timing attack protection is effective.
+**Prevention:** Always verify that an object (e.g. `user`) exists before accessing properties on records retrieved from the database, particularly in critical authentication logic.
