@@ -1,0 +1,4 @@
+## 2024-05-18 - [Fix SQL Injection Risk in Query Builder]
+**Vulnerability:** The `findOne` method in `BaseModel` (`src/core/base.model.js`) directly interpolated the object key from the user-provided condition into a raw SQL query string: `this.where(\`${this.table}.${key} = ?\`, [values[index]]);`. This created a critical SQL injection point if an attacker could control the keys of the condition object.
+**Learning:** Even though the values were properly parameterized, query builders that dynamically use user input as column names without strict validation open up SQL injection vectors.
+**Prevention:** Always validate dynamically provided column names against an allowlist pattern (e.g., `/^[a-zA-Z0-9_]+$/`) before interpolating them into SQL statements to ensure they are safe and adhere to valid schema rules.
