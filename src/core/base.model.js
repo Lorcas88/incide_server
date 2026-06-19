@@ -116,6 +116,10 @@ class BaseModel {
     const values = Object.values(conditions);
 
     keys.forEach((key, index) => {
+      // Validate key to prevent SQL injection since it's directly interpolated
+      if (!/^[a-zA-Z0-9_]+$/.test(key)) {
+        throw new Error(`Invalid query column: ${key}`);
+      }
       this.where(`${this.table}.${key} = ?`, [values[index]]);
     });
 
