@@ -1,0 +1,4 @@
+## 2024-06-25 - Missing Rate Limiting on Register and Forgot Password Endpoints
+**Vulnerability:** The `/register` and `/forgot-password` authentication endpoints lacked specific rate limiting, unlike `/login` and `/reset-password`. This missing protection could allow attackers to perform Denial of Service (DoS) attacks, flood users with emails, or conduct user enumeration via automated requests.
+**Learning:** Even with global rate limiters in place, sensitive endpoints that trigger expensive operations (like hashing passwords or sending emails) or reveal user state must have dedicated, strict rate limits to prevent targeted abuse.
+**Prevention:** Always identify all state-changing or notification-triggering unauthenticated endpoints and explicitly apply custom rate limiters to each of them directly in the route definitions.
