@@ -54,7 +54,8 @@ export const loginUser = async ({ email, password }) => {
   // Check if account is locked
   // We check this BEFORE verifying if password is correct to prevent password enumeration
   // via error message differences on locked accounts.
-  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+  // Explicitly check if 'user' exists to avoid TypeError on non-existent emails
+  if (user && user.locked_until && new Date(user.locked_until) > new Date()) {
     throw new AppError(
       "Cuenta bloqueada. Inténtalo de nuevo más tarde.",
       "ACCOUNT_LOCKED",
