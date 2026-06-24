@@ -1,0 +1,4 @@
+## 2025-03-04 - [Fix Password Enumeration & 500 Error in Auth]
+**Vulnerability:** A `TypeError: Cannot read properties of null (reading 'locked_until')` occurred during login if an email was not found in the database. Because an HTTP 500 was returned instead of an HTTP 401, attackers could perform user enumeration by observing error codes to verify if an email exists.
+**Learning:** The login process attempted to verify `user.locked_until` BEFORE ensuring the `user` object was not null, breaking the intended protection.
+**Prevention:** Always verify that an object exists before accessing its properties, especially in authentication logic that handles potentially undefined or null responses from a database lookup. Ensure error handling logic fails securely and uniformly to prevent enumeration attacks.
