@@ -68,4 +68,16 @@ describe("Account Lockout", () => {
     );
     expect(rows[0].failed_login_attempts).toBe(0);
   });
+
+  it("should not throw TypeError for invalid email login attempts", async () => {
+    // Attempt login with non-existent email
+    const res = await request(app).post("/api/v1/auth/login").send({
+      email: "doesnotexist@example.com",
+      password: "SomePassword123!",
+    });
+
+    // Should gracefully return 401 INVALID_CREDENTIALS instead of 500 TypeError
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+  });
 });
