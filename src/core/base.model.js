@@ -116,6 +116,10 @@ class BaseModel {
     const values = Object.values(conditions);
 
     keys.forEach((key, index) => {
+      // Security: Strictly validate keys to prevent SQL injection
+      if (!/^[a-zA-Z0-9_]+$/.test(key)) {
+        throw new Error(`Invalid column name: ${key}`);
+      }
       this.where(`${this.table}.${key} = ?`, [values[index]]);
     });
 
