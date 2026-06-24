@@ -52,6 +52,18 @@ describe("POST /api/v1/auth/login", () => {
     expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
   });
 
+  it("should handle login attempts with non-existent users without throwing 500", async () => {
+    const res = await request(app).post("/api/v1/auth/login").send({
+      email: "invalid_user_no_account@test.com",
+      password: "Password123",
+    });
+
+    // We specifically check it doesn't return 500 (TypeError from accessing locked_until on null)
+    expect(res.status).not.toBe(500);
+    expect(res.status).toBe(401);
+    expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+  });
+
   it("should return 401 for invalid user", async () => {
     const res = await request(app)
       .post("/api/v1/auth/login")
