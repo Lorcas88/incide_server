@@ -1,0 +1,4 @@
+## 2024-05-24 - [Auth Service: user undefined when reading locked_until]
+**Vulnerability:** `loginUser` accesses `user.locked_until` without verifying that `user` exists when attempting to login with an invalid email. This causes a TypeError (`Cannot read properties of undefined (reading 'locked_until')`), which leaks that the email does not exist (user enumeration) and breaks the login flow with a 500 server error instead of a constant-time failure.
+**Learning:** Account lockout checks in `auth.service.js` must explicitly verify the `user` object exists (e.g., `user && user.locked_until`) before checking properties to prevent TypeErrors and user enumeration on invalid emails.
+**Prevention:** Always check object existence before accessing properties when the object is retrieved dynamically (like `user = await userModel.findByEmail(email)`).
