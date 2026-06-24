@@ -40,8 +40,8 @@ export const TicketPolicy = {
   },
 
   canAssign(actor) {
-    // Admin and Support can assign tickets
-    return actor.role_id === ROLES.ADMIN || actor.role_id === ROLES.SUPPORT;
+    // Only Admin can assign tickets
+    return actor.role_id === ROLES.ADMIN;
   },
 
   canSelfAssign(actor, ticket) {
