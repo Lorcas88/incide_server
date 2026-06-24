@@ -1,0 +1,4 @@
+## 2025-03-02 - [CRITICAL] Hardcoded bcrypt rounds in password reset
+**Vulnerability:** The `resetPasswordUser` service function hardcodes the number of bcrypt rounds to `10` when hashing the new password (`bcrypt.hash(password, 10)`), ignoring the environment-configured value in `config.security.bcryptRounds`.
+**Learning:** Even when a centralized configuration is available (`config.security.bcryptRounds`), secondary flows (like password reset) can easily miss using the shared configuration and fall back to hardcoded defaults, leading to inconsistent security postures across the application.
+**Prevention:** Always use the centralized configuration variables (e.g., `config.security.bcryptRounds`) for cryptographic parameters instead of hardcoding them in individual service functions. Regularly grep for hardcoded cryptographic parameters in the codebase.
