@@ -1,0 +1,4 @@
+## 2024-05-30 - [Fix user enumeration in login]
+**Vulnerability:** A `TypeError: Cannot read properties of null` occurred when logging in with a non-existent email because `user.locked_until` was checked before confirming the `user` object actually existed. This caused the API to throw a 500 internal server error and short-circuit the login flow instead of completing the constant-time `bcrypt.compare` with the dummy hash, exposing that the email does not exist.
+**Learning:** Checking properties on potentially null database results without a prior existence check introduces unexpected exceptions that bypass critical security mechanisms like timing attack mitigations. This can be exploited for user enumeration.
+**Prevention:** Always verify that an object (such as a user record fetched from the database) is not null or undefined before accessing its properties, especially in authentication logic.
