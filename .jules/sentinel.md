@@ -1,0 +1,4 @@
+## 2024-05-15 - [SQL Injection via Dynamic Column Names]
+**Vulnerability:** SQL injection vulnerability in `BaseModel.findOne()` where the keys of the `conditions` object (representing column names) were directly interpolated into the SQL query string (`${this.table}.${key} = ?`) without validation. While values were parameterized, the dynamic keys were not.
+**Learning:** Even when using parameterized queries (e.g., `[values[index]]`) for query arguments, directly concatenating user-controlled object keys into SQL syntax for column names enables SQL injection. Object properties must never be blindly trusted in query construction.
+**Prevention:** Always validate dynamically generated SQL identifiers (like column names or table names) against a strict allowlist regex (e.g., `/^[a-zA-Z0-9_]+$/`) before interpolation, or strictly map them against known safe static schemas.
