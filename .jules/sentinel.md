@@ -1,0 +1,4 @@
+## 2025-05-18 - [CRITICAL] Fix SQL injection in `BaseModel.findOne()`
+**Vulnerability:** The `findOne` method in the `BaseModel` query builder was directly using object keys from conditions to build the `WHERE` clause without any sanitization or validation. While values were parameterized, an attacker could potentially manipulate the keys to inject malicious SQL commands (e.g. `{'email = "admin@incide.com" OR 1=1 -- ': 'anything'}`).
+**Learning:** Even when using parameterized queries (using `?` placeholders) for the *values*, SQL injection can still occur if the structural parts of the query (like column names derived from object keys) are taken directly from user input without validation.
+**Prevention:** Always validate and sanitize dynamic column names or structural query components using a strict allowlist or regex (like `/^[a-zA-Z0-9_]+$/`) to ensure they only contain safe characters before interpolating them into SQL statements.
