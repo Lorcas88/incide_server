@@ -1,0 +1,4 @@
+## 2025-02-27 - [Fix SQL Injection in Base Model findOne]
+**Vulnerability:** The `findOne(conditions)` method in `BaseModel` (`src/core/base.model.js`) directly interpolated object keys into the raw SQL string query (`${this.table}.${key} = ?`). Even though values were parameterized, an attacker providing crafted keys (e.g., via a query parameter directly mapped to `conditions`) could inject arbitrary SQL logic.
+**Learning:** In dynamically constructed queries, all identifiers (like table names and column names) that originate from potentially untrusted sources must be strictly validated because SQL parameters (`?`) only escape values, not identifiers.
+**Prevention:** Implement strict allowlist validation (e.g., regex `/^[a-zA-Z0-9_]+$/`) on all dynamically used identifiers before interpolating them into SQL strings to ensure they map to valid schema structures.
