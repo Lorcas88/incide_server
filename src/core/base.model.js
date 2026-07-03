@@ -115,6 +115,14 @@ class BaseModel {
     const keys = Object.keys(conditions);
     const values = Object.values(conditions);
 
+    // Validate keys to prevent SQL injection
+    const keyRegex = /^[a-zA-Z0-9_]+$/;
+    for (const key of keys) {
+      if (!keyRegex.test(key)) {
+        throw new Error(`Invalid condition key: ${key}`);
+      }
+    }
+
     keys.forEach((key, index) => {
       this.where(`${this.table}.${key} = ?`, [values[index]]);
     });
